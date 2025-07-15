@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistente Normativo SENA</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font: Exo (for background) and Inter (for chat content, if needed, but Exo is global now) -->
+    <link href="https://fonts.googleapis.com/css2?family=Exo:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- New font for "DEMO" text -->
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet">
+    <!-- LottieFiles Web Player CDN -->
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <style>
+        /* Global styles for all elements */
+        *, *:before, *:after {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Exo', sans-serif; /* Applied Exo as global font */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden; /* Keep overflow hidden for body to prevent scrollbars */
+            background: #333641; /* Background color from DEMO CSS, but Area will cover it */
+        }
+
+        /* Animated background styles from user's CSS, adapted for responsiveness */
+        .area {
+            background: #ff8044;
+            background: -webkit-linear-gradient(to left, #8f94fb, #4e54c8);
+            width: 100%;
+            height: 100vh;
+            position: fixed; /* Fixed to cover the entire viewport */
+            top: 0;
+            left: 0;
+            z-index: -2; /* Ensure it's behind the chat container */
+        }
+
+        .circles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .circles li {
+            position: absolute;
+            display: block;
+            list-style: none;
+            background: rgba(255, 255, 255, 0.2);
+            animation: animate 25s linear infinite;
+            bottom: -30vmin; /* Responsive bottom offset */
+        }
+
+        /* Responsive sizing for circles using vmin */
+        .circles li:nth-child(1) {
+            left: 25%;
+            width: 20vmin;
+            height: 20vmin;
+            animation-delay: 0s;
+        }
+        .circles li:nth-child(2) {
+            left: 10%;
+            width: 5vmin;
+            height: 5vmin;
+            animation-delay: 2s;
+            animation-duration: 12s;
+        }
+        .circles li:nth-child(3) {
+            left: 70%;
+            width: 5vmin;
+            height: 5vmin;
+            animation-delay: 4s;
+        }
+        .circles li:nth-child(4) {
+            left: 40%;
+            width: 15vmin;
+            height: 15vmin;
+            animation-delay: 0s;
+            animation-duration: 18s;
+        }
+        .circles li:nth-child(5) {
+            left: 65%;
+            width: 5vmin;
+            height: 5vmin;
+            animation-delay: 0s;
+        }
+        .circles li:nth-child(6) {
+            left: 75%;
+            width: 27.5vmin;
+            height: 27.5vmin;
+            animation-delay: 3s;
+        }
+        .circles li:nth-child(7) {
+            left: 35%;
+            width: 37.5vmin;
+            height: 37.5vmin;
+            animation-delay: 7s;
+        }
+        .circles li:nth-child(8) {
+            left: 50%;
+            width: 6.25vmin;
+            height: 6.25vmin;
+            animation-delay: 15s;
+            animation-duration: 45s;
+        }
+        .circles li:nth-child(9) {
+            left: 20%;
+            width: 3.75vmin;
+            height: 3.75vmin;
+            animation-delay: 2s;
+            animation-duration: 35s;
+        }
+        .circles li:nth-child(10) {
+            left: 85%;
+            width: 37.5vmin;
+            height: 37.5vmin;
+            animation-delay: 0s;
+            animation-duration: 11s;
+        }
+
+        @keyframes animate {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+                border-radius: 0;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(720deg); /* Responsive vertical movement */
+                opacity: 0;
+                border-radius: 50%;
+            }
+        }
+
+        /* Existing chat container styles, adjusted for new background */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 600px;
+            height: 90vh; /* Adjusted for better viewing on different screens */
+            background-color: rgba(76, 184, 182, 0.0275); /* Increased transparency by 45% */
+            backdrop-filter: blur(15px); /* Slightly increased blur for more effect */
+            -webkit-backdrop-filter: blur(15px); /* For Safari support */
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            z-index: 1; /* Ensure chat container is above the animated background */
+        }
+        .chat-header {
+            background-color: rgba(76, 184, 182, 0.275); /* Increased transparency by 45% */
+            color: #333; /* Dark text for contrast on white header */
+            padding: 1rem;
+            text-align: center;
+            font-size: 1.25rem;
+            font-weight: 600;
+            border-top-left-radius: 1rem;
+            border-top-right-radius: 1rem;
+            display: flex; /* Use flexbox for centering the image */
+            flex-direction: column; /* Allow stacking of elements */
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+            min-height: 100px; /* Increased minimum height to prevent shrinking */
+            flex-shrink: 0; /* Prevent header from shrinking */
+        }
+        .chat-header img {
+            max-width: 90%; /* Make sure the image fits within the header */
+            height: auto; /* Maintain aspect ratio */
+            border-radius: 0.5rem; /* Rounded corners for the image */
+            margin-bottom: 0.5rem; /* Space between image and dropdown */
+        }
+        .profile-selector-container {
+            margin-top: 0.5rem;
+            width: 80%; /* Adjust width for better appearance */
+            text-align: center;
+            /* Flex properties for alignment within chat-input */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem; /* Space between label and select */
+            padding-top: 0.5rem; /* Add some padding above */
+            padding-bottom: 0.5rem; /* Add some padding below */
+        }
+        .profile-selector-container label {
+            color: white; /* Changed to white for better contrast on dark footer */
+            font-size: 0.9rem;
+            margin-right: 0.5rem;
+        }
+        .profile-selector-container select {
+            padding: 0.3rem 0.6rem;
+            border-radius: 0.5rem;
+            border: 1px solid #4CB8B6; /* Updated to main background color */
+            background-color: rgba(76, 184, 182, 0.39); /* Increased transparency by 45% */
+            color: #333;
+            font-size: 0.9rem;
+            outline: none;
+        }
+        .chat-messages {
+            flex-grow: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            background-color: rgba(76, 184, 182, 0.22); /* Increased transparency by 45% */
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .message-container { /* New container for message and avatar */
+            display: flex;
+            align-items: flex-start; /* Align avatar and message content to the start */
+            gap: 0.5rem;
+            opacity: 0; /* Initial state for animation */
+            transform: translateY(20px); /* Initial state for animation */
+            animation: fadeInSlideUp 0.3s ease-out forwards; /* Animation */
+        }
+        /* Keyframe animation for messages */
+        @keyframes fadeInSlideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .message {
+            max-width: 80%;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            word-wrap: break-word;
+            background-color: rgba(76, 184, 182, 0.198); /* Increased transparency by 45% */
+            backdrop-filter: blur(5px); /* Applied blur to messages */
+            -webkit-backdrop-filter: blur(5px); /* For Safari support */
+        }
+        .user-message {
+            color: black; /* Changed to black font color */
+            align-self: flex-end;
+            border-bottom-right-radius: 0.25rem;
+            margin-left: auto; /* Push user message to the right */
+        }
+        .bot-message {
+            color: black; /* Changed to black font color */
+            border: 1px solid #4CB8B6; /* Updated to main background color */
+            border-bottom-left-radius: 0.25rem;
+        }
+        .bot-avatar { /* Styles for chatbot avatar */
+            width: 60px; /* Increased size by 50% from 40px */
+            height: 60px; /* Increased size by 50% from 40px */
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0; /* Prevent image from shrinking */
+        }
+        .bot-content-wrapper { /* New container for message text and GIF */
+            display: flex;
+            flex-direction: column; /* Stack text and GIF */
+            align-items: flex-start; /* Align content to the left */
+            max-width: calc(80% - 60px - 0.5rem); /* Adjust max-width considering new avatar size and gap */
+        }
+        .bot-thinking-lottie { /* Styles for Lottie animation */
+            width: 30px; /* Adjust size as needed */
+            height: 30px;
+            margin-top: 5px; /* Space between message and animation */
+            border-radius: 0.25rem; /* Slightly rounded corners */
+            display: none; /* Hidden by default */
+        }
+        /* Styles for chapter buttons */
+        .chapter-buttons-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            justify-content: center; /* Center buttons */
+        }
+        .chapter-button {
+            background-color: #3A9B99; /* Darker shade of main color */
+            color: white;
+            padding: 0.6rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-weight: 500;
+            flex: 1 1 auto; /* Allow buttons to grow and shrink */
+            min-width: 120px; /* Minimum width for buttons */
+            text-align: center;
+        }
+        .chapter-button:hover {
+            background-color: #5CD0CE; /* Lighter shade of main color for hover */
+        }
+
+        .chat-input {
+            display: flex;
+            flex-direction: column; /* Changed to column to stack input and buttons */
+            padding: 1rem;
+            border-top: 1px solid rgba(76, 184, 182, 0.275); /* Increased transparency by 45% */
+            background-color: rgba(76, 184, 182, 0.275); /* Increased transparency by 45% */
+            border-bottom-left-radius: 1rem;
+            border-bottom-right-radius: 1rem;
+            align-items: center; /* Align elements vertically */
+            gap: 0.75rem; /* Space between elements */
+            flex-shrink: 0; /* Prevent input area from shrinking */
+        }
+        .input-and-buttons { /* New wrapper for input and send/voice buttons */
+            display: flex;
+            width: 100%;
+            gap: 0.75rem;
+            flex-wrap: wrap; /* Allow buttons to wrap */
+            justify-content: center; /* Center buttons when wrapped */
+        }
+        .chat-input input {
+            flex-grow: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid #4CB8B6; /* Updated to main background color */
+            border-radius: 0.5rem;
+            outline: none;
+            font-size: 1rem;
+            min-width: 150px; /* Ensure input is not too small */
+        }
+        .chat-input button {
+            background-color: #3A9B99; /* Darker shade of main color */
+            color: white;
+            padding: 0.75rem 1.25rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-weight: 500;
+            flex-shrink: 0; /* Prevent buttons from shrinking */
+        }
+        .chat-input button:hover {
+            background-color: #5CD0CE; /* Lighter shade of main color for hover */
+        }
+        /* Styles for the voice button */
+        #voiceBtn {
+            background-color: #3A9B99; /* Unified with other buttons */
+        }
+        #voiceBtn:hover {
+            background-color: #5CD0CE; /* Unified with other buttons */
+        }
+        /* Styles for the new LLM feature button */
+        #generateCaseBtn {
+            background-color: #3A9B99; /* Unified with other buttons */
+        }
+        #generateCaseBtn:hover {
+            background-color: #5CD0CE; /* Unified with other buttons */
+        }
+
+        /* CSS for the "DEMO" text */
+        .demo-text {
+            position: absolute;
+            top: 20px; /* Adjust as needed for spacing from top */
+            right: 20px; /* Adjust as needed for spacing from right */
+            color: #fff;
+            background: 50% 100%/50% 50% no-repeat radial-gradient(ellipse at bottom, #fff, transparent, transparent);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-size: 5vw; /* Responsive font size for DEMO */
+            font-family: "Source Sans Pro", sans-serif;
+            -webkit-animation: reveal 3000ms ease-in-out forwards 200ms, glow 2500ms linear infinite 2000ms;
+            animation: reveal 3000ms ease-in-out forwards 200ms, glow 2500ms linear infinite 2000ms;
+            z-index: 2; /* Ensure it's above the background and below the chatbot */
+        }
+        @-webkit-keyframes reveal {
+            80% {
+                letter-spacing: 8px;
+            }
+            100% {
+                background-size: 300% 300%;
+            }
+        }
+        @keyframes reveal {
+            80% {
+                letter-spacing: 8px;
+            }
+            100% {
+                background-size: 300% 300%;
+            }
+        }
+        @-webkit-keyframes glow {
+            40% {
+                text-shadow: 0 0 8px #fff;
+            }
+        }
+        @keyframes glow {
+            40% {
+                text-shadow: 0 0 8px #fff;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- New animated background with circles -->
+    <div class="area">
+        <ul class="circles">
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+        </ul>
+    </div>
+
+    <!-- "DEMO" text with animation -->
+    <div class="demo-text">DEMO</div>
+
+    <div class="chat-container">
+        <div class="chat-header">
+            <img src="https://i.ibb.co/x87vZP6c/imagen-2025-07-04-114055915.png" alt="Logo SENA Centro de Gestión Administrativa">
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            </div>
+        <div class="chat-input">
+            <div class="profile-selector-container">
+                <label for="profileSelector">Soy:</label>
+                <select id="profileSelector">
+                    <option value="aprendiz">Aprendiz</option>
+                    <option value="instructor">Instructor</option>
+                    <option value="administrativo">Administrativo</option>
+                </select>
+            </div>
+            <div class="input-and-buttons">
+                <input type="text" id="userInput" placeholder="Escribe tu pregunta aquí...">
+                <button id="sendBtn">Enviar</button>
+                <button id="voiceBtn">Habilitar Voz</button>
+                <button id="generateCaseBtn">Generar Caso de Estudio ✨</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatMessages = document.getElementById('chatMessages');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const profileSelector = document.getElementById('profileSelector');
+        const voiceBtn = document.getElementById('voiceBtn');
+        const generateCaseBtn = document.getElementById('generateCaseBtn'); // New button
+
+        // URL of the chatbot avatar
+        const botAvatarUrl = 'https://cdn.dribbble.com/userupload/25363976/file/original-2b1bda72996c25af018e9d82e395613e.gif'; // New GIF URL
+        // URL of the Lottie animation for "thinking/speaking" (voice wave)
+        const botThinkingLottieUrl = 'https://assets1.lottiefiles.com/packages/lf20_m2r62b.json'; // A voice wave animation
+
+        let synth = window.speechSynthesis;
+        let utterance = new SpeechSynthesisUtterance();
+        let voiceEnabled = false;
+        let currentBotLottieElement = null; // To control the Lottie animation of the last bot message
+        let awaitingCaseTopic = false; // State to know if we are waiting for the case topic
+
+        // SpeechSynthesisUtterance configuration for advanced text-to-speech
+        utterance.lang = 'es-US'; // Set language to Spanish (United States)
+        utterance.rate = 1; // Speech rate (1 is normal)
+        utterance.pitch = 1; // Speech pitch (1 is normal)
+
+        // Attempt to select a Latin American Spanish voice, specifically Google's if available
+        synth.onvoiceschanged = () => {
+            const voices = synth.getVoices();
+            let selectedVoice = null;
+
+            // Prioritize Google US Spanish voice
+            selectedVoice = voices.find(voice => 
+                voice.name.includes('Google español') && (voice.lang === 'es-US' || voice.lang === 'es-419')
+            );
+
+            // Fallback to any es-US or es-419 voice if Google US Spanish is not found
+            if (!selectedVoice) {
+                selectedVoice = voices.find(voice => voice.lang === 'es-US' || voice.lang === 'es-419');
+            }
+
+            // Fallback to any es-LA voice if specific regional voices are not found
+            if (!selectedVoice) {
+                selectedVoice = voices.find(voice => voice.lang.startsWith('es') && (
+                    voice.name.includes('Latina') ||
+                    voice.name.includes('Mexico') ||
+                    voice.name.includes('Colombia') ||
+                    voice.name.includes('América')
+                ));
+            }
+            
+            // Fallback to any es-ES voice if no es-LA voice is found (should be rare)
+            if (!selectedVoice) {
+                selectedVoice = voices.find(voice => voice.lang === 'es-ES');
+            }
+            // Final fallback to the first available Spanish voice
+            if (!selectedVoice) {
+                selectedVoice = voices.find(voice => voice.lang.startsWith('es'));
+            }
+
+            if (selectedVoice) {
+                utterance.voice = selectedVoice;
+                console.log('Using voice:', selectedVoice.name, selectedVoice.lang);
+            } else {
+                console.warn('No suitable Spanish voice found. Using default browser voice.');
+            }
+        };
+        // Call onvoiceschanged immediately if voices are already loaded
+        if (synth.getVoices().length > 0) {
+            synth.onvoiceschanged();
+        }
+
+
+        utterance.onend = () => {
+            // Hide and stop the Lottie animation when speech synthesis ends
+            if (currentBotLottieElement) {
+                currentBotLottieElement.style.display = 'none';
+                currentBotLottieElement.stop();
+            }
+        };
+        utterance.onerror = (event) => {
+            // Only log errors that are not 'canceled'
+            if (event.error !== 'canceled') {
+                console.error('Speech synthesis error:', event.error);
+            }
+            // Always hide and stop the Lottie animation if there's an error or cancellation
+            if (currentBotLottieElement) {
+                currentBotLottieElement.style.display = 'none';
+                currentBotLottieElement.stop();
+            }
+        };
+
+        // Global function to display a chapter summary when the button is clicked
+        window.showChapterSummary = function(chapterNum) {
+            let summary = knowledgeBase.capitulos['capitulo_' + chapterNum];
+            addMessage(summary, 'bot');
+        };
+
+        // Expanded knowledge base of the regulation
+        const knowledgeBase = {
+            "derechos": {
+                "general": "Los aprendices del SENA tienen una serie de derechos fundamentales, entre ellos, recibir una inducción completa sobre el reglamento, formación profesional integral de calidad y acceso a la infraestructura y recursos necesarios. También se garantiza el debido proceso en cualquier situación académica o disciplinaria. Además, tienen derecho a ser reconocidos en su diversidad, incluyendo si tienen alguna discapacidad o pertenecen a grupos de especial protección. (Basado en el <strong>ARTÍCULO 5</strong> del Reglamento del Aprendiz SENA - Acuerdo 009 de 2024).",
+                "articulo_5": "El <strong>ARTÍCULO 5</strong> del Reglamento del Aprendiz SENA detalla los derechos específicos, como recibir inducción, formación de calidad, acceso a recursos, elementos de protección personal, beneficios de bienestar, orientación humanista, reconocimiento de discapacidad o grupos de especial protección, debido proceso, notificación de novedades, ser escuchado en peticiones, recibir asesoría para denunciar, participar en la mejora continua, ser evaluado objetivamente, solicitar revisión de evaluaciones, recibir información sobre etapa productiva, trato digno, expresar libremente el pensamiento, postularse a estrategias de fortalecimiento, participar en elección de representantes, desarrollar actividades formativas justificadas y obtener certificación o título."
+            },
+            "incumplimiento": {
+                "justificado": "Si el incumplimiento de una actividad formativa está justificado, el aprendiz puede desarrollar la actividad en un cronograma establecido por los instructores, siempre que presente la justificación dentro de los términos del reglamento. (Basado en el <strong>ARTÍCULO 28</strong> del Reglamento del Aprendiz SENA - Acuerdo 009 de 2024).",
+                "injustificado": "En caso de incumplimiento injustificado de una actividad formativa, podría llevar a un proceso de deserción, lo cual tiene un procedimiento específico detallado en el <strong>CAPÍTULO IV</strong> del reglamento. (Basado en los <strong>ARTÍCULOS 29 Y 30</strong> del Reglamento del Aprendiz SENA - Acuerdo 009 de 2024).",
+                "general": "El reglamento aborda el incumplimiento de actividades. Si el incumplimiento está justificado, el aprendiz puede desarrollar la actividad en un cronograma establecido por los instructores, siempre que presente la justificación dentro de los términos del reglamento. En caso de incumplimiento injustificado, podría llevar a un proceso de deserción, lo cual tiene un procedimiento específico detallado en el <strong>CAPÍTULO IV</strong> del reglamento. ¿Desea conocer más sobre el procedimiento de justificación o las implicaciones de la deserción? (Basado en los <strong>ARTÍCULOS 28, 29 Y 30</strong> del Reglamento del Aprendiz SENA - Acuerdo 009 de 2024)."
+            },
+            "sanciones": {
+                "general": "El <strong>CAPÍTULO V</strong> del reglamento detalla el Régimen de Faltas, Medidas Formativas, Disciplinarias y Sancionatorias. Este capítulo establece los principios, tipos de faltas (leves, graves, gravísimas), medidas formativas y sancionatorias, y los procedimientos para su aplicación. ¿Le gustaría saber sobre algún tipo de falta o sanción específica? (Basado en el <strong>CAPÍTULO V</strong> del Reglamento del Aprendiz SENA - Acuerdo 009 de 2024)."
+            },
+            "capitulos": {
+                "general": "El Reglamento del Aprendiz SENA se estructura en varios capítulos. Por favor, haz clic en el botón del capítulo que te interese para ver un resumen:\n\n" +
+                         "<div class='chapter-buttons-container'>" +
+                         "<button class='chapter-button' onclick='showChapterSummary(1)'>Capítulo I: Definiciones</button>" +
+                         "<button class='chapter-button' onclick='showChapterSummary(2)'>Capítulo II: Derechos</button>" +
+                         "<button class='chapter-button' onclick='showChapterSummary(3)'>Capítulo III: Deberes</button>" +
+                         "<button class='chapter-button' onclick='showChapterSummary(4)'>Capítulo IV: Ingreso, Permanencia y Certificación</button>" +
+                         "<button class='chapter-button' onclick='showChapterSummary(5)'>Capítulo V: Faltas y Sanciones</button>" +
+                         "</div>",
+                "capitulo_1": "El <strong>CAPÍTULO I: DEFINICIONES</strong> (Artículos 1-4) establece los términos clave del reglamento, como 'Formación Profesional Integral', 'Comunidad Educativa SENA', 'Aspirante', 'Aprendiz' y 'Grupo'. También define el alcance del reglamento y los principios orientadores como Autonomía, Dignidad, Inclusión, Enfoque Diferencial, Enfoque Territorial, Participación, Desarrollo Sostenible y Solidaridad. Además, introduce el concepto de Centro de Convivencia.",
+                "capitulo_2": "El <strong>CAPÍTULO II: DERECHOS DEL APRENDIZ SENA</strong> (Artículos 5-7) detalla los derechos fundamentales de los aprendices, incluyendo el derecho a recibir inducción, formación de calidad, acceso a infraestructura y recursos, elementos de protección personal, beneficios de bienestar, orientación humanista, reconocimiento de discapacidad o grupos de especial protección, debido proceso, notificación de novedades, ser escuchado en peticiones, recibir asesoría para denunciar, participar en la mejora continua, ser evaluado objetivamente, solicitar revisión de evaluaciones, recibir información sobre etapa productiva, trato digno, expresar libremente el pensamiento, postularse a estrategias de fortalecimiento, participar en elección de representantes, desarrollar actividades formativas justificadas y obtener certificación o título. También aborda los reconocimientos formativos y la representatividad de los aprendices.",
+                "capitulo_3": "El <strong>CAPÍTULO III: DEBERES DEL APRENDIZ SENA</strong> (Artículos 8-9) establece las responsabilidades que los aprendices deben cumplir durante su proceso formativo, así como las prohibiciones. Estos deberes y prohibiciones buscan garantizar un ambiente de aprendizaje adecuado y el cumplimiento de las normativas institucionales.",
+                "capitulo_4": "El <strong>CAPÍTULO IV: INGRESO, PERMANENCIA Y CERTIFICACIÓN</strong> (Artículos 10-38) cubre exhaustivamente los procedimientos para el ingreso al SENA (registro, inscripción, selección y matrícula), los trámites académicos y administrativos durante la formación (novedades, reingreso), el proceso de formación en sí (cumplimiento, incumplimiento justificado/injustificado, deserción), y el proceso de evaluación del aprendizaje (evidencias, principios, acompañamiento y juicios de evaluación).",
+                "capitulo_5": "El <strong>CAPÍTULO V: RÉGIMEN DE FALTAS, MEDIDAS FORMATIVAS, DISCIPLINARIAS Y SANCIONATORIAS</strong> (Artículos 39-53) define los principios que orientan este régimen, los tipos de medidas (disciplinarias, formativas, académicas y/o sancionatorias), la clasificación de las faltas (leves, graves, gravísimas), los criterios para calificarlas, los tipos de medidas formativas y sancionatorias, los equipos encargados de la valoración, las instancias decisorias y el procedimiento para la aplicación de sanciones. También aborda la certificación de conducta y la sujeción a la Constitución y la ley."
+            },
+            "casos": {
+                // Casos Capítulo II: Derechos del Aprendiz SENA
+                "caso_discapacidad_auditiva": "<strong>CASO:</strong> UN APRENDIZ CON DISCAPACIDAD AUDITIVA NO RECIBE EL APOYO NECESARIO PARA LA COMUNICACIÓN EN EL AULA, A PESAR DE HABERLO SOLICITADO AL INICIO DE SU FORMACIÓN.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL APRENDIZ TIENE DERECHO A SER RECONOCIDO COMO PERSONA CON DISCAPACIDAD Y A SOLICITAR AJUSTES RAZONABLES. DEBE DOCUMENTAR SU SOLICITUD Y LAS RESPUESTAS (O FALTA DE ELLAS) Y, EN PRIMERA INSTANCIA, DIRIGIRSE AL INSTRUCTOR Y/O A LA COORDINACIÓN ACADÉMICA PARA REITERAR SU NECESIDAD. SI NO HAY SOLUCIÓN, PUEDE ELEVAR UNA PETICIÓN RESPETUOSA A LAS DIRECTIVAS DEL CENTRO DE FORMACIÓN, CITANDO EL <strong>ARTÍCULO 5º, NUMERAL 8</strong> DEL REGLAMENTO. SI ESTO PERSISTE, PUEDE ACTIVAR LAS RUTAS DE ATENCIÓN PARA DENUNCIAR LA VULNERACIÓN DE SUS DERECHOS, SEGÚN EL <strong>ARTÍCULO 5º, NUMERAL 13</strong>.",
+                "caso_evaluacion_sin_recursos": "<strong>CASO:</strong> UN APRENDIZ ES EVALUADO EN UNA COMPETENCIA SIN HABER RECIBIDO LA FORMACIÓN COMPLETA O LOS RECURSOS DIDÁCTICOS PROMETIDOS PARA ESA UNIDAD.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL APRENDIZ TIENE DERECHO A RECIBIR FORMACIÓN DE CALIDAD CON LOS RECURSOS NECESARIOS Y A SER EVALUADO OBJETIVA E INTEGRALMENTE CON BASE EN LOS CRITERIOS DE EVALUACIÓN Y RUTA FORMATIVA. PUEDE SOLICITAR RESPETUOSAMENTE LA REVISIÓN DE LA EVALUACIÓN, ARGUMENTANDO LA FALTA DE RECURSOS O FORMACIÓN PREVIA A LA MISMA, SEGÚN EL <strong>ARTÍCULO 5º, NUMERAL 16</strong>.",
+                "caso_revision_calificacion_negada": "<strong>CASO:</strong> UN APRENDIZ SOLICITA LA REVISIÓN DE UNA CALIFICACIÓN QUE CONSIDERA INJUSTA, PERO EL INSTRUCTOR SE NIEGA A ATENDER SU SOLICITUD O LE DA UNA RESPUESTA SUPERFICIAL SIN UN ANÁLISIS OBJETIVO.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL APRENDIZ TIENE DERECHO A SOLICITAR LA REVISIÓN DE SUS EVALUACIONES SI CONSIDERA QUE EL RESULTADO NO ES OBJETIVO. SI EL INSTRUCTOR NO ATIENDE LA PETICIÓN DE FORMA ADECUADA, EL APRENDIZ PUEDE ELEVAR UNA PETICIÓN RESPETUOSA A LA COORDINACIÓN ACADÉMICA O A LA INSTANCIA SUPERIOR COMPETENTE EN EL CENTRO DE FORMACIÓN, HACIENDO REFERENCIA AL <strong>ARTÍCULO 5º, NUMERAL 16</strong>.",
+                "caso_embarazada_etapa_productiva": "<strong>CASO:</strong> UNA APRENDIZ EMBARAZADA SOLICITA INFORMACIÓN SOBRE SUS DERECHOS Y LAS ADAPTACIONES QUE PUEDE RECIBIR DURANTE SU ETAPA PRODUCTIVA, PERO NO LE BRINDAN UNA ORIENTACIÓN CLARA NI COMPLETA.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> LA APRENDIZ TIENE DERECHO A RECIBIR INFORMACIÓN Y ORIENTACIÓN CLARA Y COMPLETA SOBRE LAS OPCIONES PARA DESARROLLAR SU ETAPA PRODUCTIVA, DERECHOS Y OBLIGACIONES. DEBE INSISTIR EN SU SOLICITUD Y, SI ES NECESARIO, FORMALIZAR UNA PETICIÓN POR ESCRITO ANTE LA COORDINACIÓN DE LA ETAPA PRODUCTIVA O EL ÁREA DE BIENESTAR AL APRENDIZ, HACIENDO REFERENCIA AL <strong>ARTÍCULO 5º, NUMERAL 17</strong>.",
+                "caso_falta_epp": "<strong>CASO:</strong> UN GRUPO DE APRENDICES NOTA QUE NO SE ESTÁN ENTREGANDO LOS ELEMENTOS DE PROTECCIÓN PERSONAL (EPP) NECESARIOS PARA LAS PRÁCTICAS DE LABORATORIO, PONIENDO EN RIESGO SU SEGURIDAD.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> LOS APRENDICES TIENEN DERECHO A RECIBIR OPORTUNAMENTE LOS EPP PARA SALVAGUARDAR SU INTEGRIDAD FÍSICA. DEBEN COMUNICAR INMEDIATAMENTE LA SITUACIÓN A SU INSTRUCTOR Y/O AL COORDINADOR DEL PROGRAMA. SI LA SITUACIÓN PERSISTE, PUEDEN ELEVAR UNA QUEJA FORMAL A LA DIRECCIÓN DEL CENTRO DE FORMACIÓN, AMPARÁNDOSE EN EL <strong>ARTÍCULO 5º, NUMERAL 5</strong>.",
+                "caso_trato_discriminatorio": "<strong>CASO:</strong> UN APRENDIZ ES OBJETO DE COMENTARIOS DESPECTIVOS O TRATO DISCRIMINATORIO POR PARTE DE UN INSTRUCTOR O COMPAÑERO DEBIDO A SU ORIENTACIÓN SEXUAL.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL APRENDIZ TIENE DERECHO A RECIBIR UN TRATO DIGNO, RESPETUOSO, IGUALITARIO Y JUSTO. DEBE DENUNCIAR LA SITUACIÓN ANTE EL COORDINADOR ACADÉMICO, EL SUBDIRECTOR DEL CENTRO O A TRAVÉS DE LAS RUTAS DE ATENCIÓN ESTABLECIDAS PARA ESTOS CASOS, HACIENDO REFERENCIA AL <strong>ARTÍCULO 5º, NUMERAL 13</strong> Y A LOS PRINCIPIOS DE DIGNIDAD E INCLUSIÓN (<strong>ARTÍCULO 3º, NUMERALES 2 Y 3</strong>).",
+                "caso_reconocimiento_ignorado": "<strong>CASO:</strong> UN APRENDIZ QUE SE HA DESTACADO EN SU PROGRAMA DE FORMACIÓN ES IGNORADO PARA UN RECONOCIMIENTO FORMATIVO (EJ. SER MONITOR) A PESAR DE CUMPLIR CON TODOS LOS REQUISITOS DE LA CONVOCATORIA, MIENTRAS QUE OTRO APRENDIZ CON MENOR MÉRITO ES SELECCIONADO.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL APRENDIZ TIENE DERECHO A ACCEDER A RECONOCIMIENTOS FORMATIVOS POR SU DESEMPEÑO SOBRESALIENTE. SI CONSIDERA QUE EL PROCESO DE SELECCIÓN NO FUE OBJETIVO, PUEDE SOLICITAR UNA REVISIÓN DE LA DECISIÓN ANTE LA SUBDIRECCIÓN DEL CENTRO DE FORMACIÓN, APORTANDO PRUEBAS DE SUS MÉRITOS Y EL CUMPLIMIENTO DE LOS REQUISITOS.",
+                "caso_restriccion_representante": "<strong>CASO:</strong> UN APRENDIZ INTENTA PARTICIPAR EN LA ELECCIÓN DEL REPRESENTANTE DE APRENDICES, PERO LE INFORMAN QUE NO PUEDE POSTULARSE PORQUE SU PROGRAMA DE FORMACIÓN ES SEMIPRESENCIAL, SIN QUE ESTO ESTÉ JUSTIFICADO EN LA CONVOCATORIA.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL APRENDIZ TIENE DERECHO A PARTICIPAR EN EL PROCESO DE ELECCIÓN DEL REPRESENTANTE DE APRENDICES, YA SEA PARA ELEGIR O SER ELEGIDO, DE ACUERDO CON EL REGLAMENTO Y LOS REQUISITOS ESTABLECIDOS. SI NO HAY UNA RESTRICCIÓN EXPLÍCITA Y JUSTIFICADA EN LA NORMATIVA VIGENTE, DEBE PRESENTAR UNA PETICIÓN FORMAL A LA INSTANCIA ENCARGADA DE LA ELECCIÓN, SOLICITANDO CLARIDAD SOBRE LA RESTRICCIÓN Y LA POSIBILIDAD DE POSTULARSE.",
+                "caso_no_notificado_novedad": "<strong>CASO:</strong> UN APRENDIZ NO ES NOTIFICADO DE UNA NOVEDAD ACADÉMICA (COMO UN CAMBIO EN EL CRONOGRAMA DE CLASES O LA ASIGNACIÓN DE UN NUEVO INSTRUCTOR), LO QUE LE CAUSA INCONVENIENTES Y LA PÉRDIDA DE UNA ACTIVIDAD.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL APRENDIZ TIENE DERECHO A SER NOTIFICADO DE LAS NOVEDADES ACADÉMICAS. DEBE REPORTAR LA FALTA DE NOTIFICACIÓN AL INSTRUCTOR Y/O COORDINADOR, Y SOLICITAR LA OPORTUNIDAD DE PRESENTAR LA ACTIVIDAD PERDIDA, ARGUMENTANDO LA VULNERACIÓN DE SU DERECHO A LA NOTIFICACIÓN, CONFORME AL <strong>ARTÍCULO 5º, NUMERAL 11 Y 22</strong>.",
+                "caso_instructor_niega_asesoria": "<strong>CASO:</strong> UN APRENDIZ SOLICITA A SU INSTRUCTOR UNA ASESORÍA PERSONALIZADA SOBRE UN TEMA COMPLEJO DEL PROGRAMA, PERO EL INSTRUCTOR SE NIEGA SISTEMÁTICAMENTE O POSPONE LA ASESORÍA SIN UNA JUSTIFICACIÓN VÁLIDA.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL APRENDIZ TIENE DERECHO A RECIBIR ORIENTACIÓN HUMANISTA, OCUPACIONAL Y ACTITUDINAL QUE ESTIMULE SU DESARROLLO. AUNQUE NO SE ESPECIFICA LA CANTIDAD DE ASESORÍAS, EL INSTRUCTOR DEBE PROPORCIONAR UN ACOMPAÑAMIENTO ADECUADO. SI LA SITUACIÓN PERSISTE, EL APRENDIZ DEBE COMUNICARSE CON EL COORDINADOR ACADÉMICO PARA BUSCAR UNA SOLUCIÓN Y SOLICITAR UN ESPACIO DE ASESORÍA CON EL INSTRUCTOR O CON OTRO PROFESIONAL.",
+                // Nuevos casos Capítulo II: Derechos del Aprendiz SENA
+                "caso_participacion_eventos": "<strong>CASO:</strong> UN APRENDIZ DESEA PARTICIPAR EN UN EVENTO CULTURAL ORGANIZADO POR EL SENA, PERO SU INSTRUCTOR LE NIEGA EL PERMISO ARGUMENTANDO QUE AFECTARÁ SU RENDIMIENTO ACADÉMICO, A PESAR DE QUE EL EVENTO ES FUERA DE HORARIO DE CLASE.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL APRENDIZ TIENE DERECHO A POSTULARSE O PARTICIPAR EN ESTRATEGIAS QUE EL SENA PROPONGA PARA SU FORTALECIMIENTO INTEGRAL. SI EL EVENTO NO INTERFIERE CON SUS ACTIVIDADES ACADÉMICAS, EL INSTRUCTOR NO DEBE NEGAR EL PERMISO SIN UNA CAUSA JUSTIFICADA. EL APRENDIZ PUEDE ELEVAR UNA PETICIÓN A LA COORDINACIÓN ACADÉMICA O AL ÁREA DE BIENESTAR AL APRENDIZ, CITANDO EL <strong>ARTÍCULO 5º, NUMERAL 20</strong> DEL REGLAMENTO.",
+                "caso_retroalimentacion_evaluacion_tardia": "<strong>CASO:</strong> UN APRENDIZ PRESENTA UNA EVIDENCIA DE APRENDIZAJE, PERO EL INSTRUCTOR TARDA MÁS DE 15 DÍAS EN ENTREGAR LA RETROALIMENTACIÓN Y LA CALIFICACIÓN, AFECTANDO LA OPORTUNIDAD DE MEJORA DEL APRENDIZ.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL APRENDIZ TIENE DERECHO A CONOCER LOS RESULTADOS DE SUS EVALUACIONES DENTRO DE LOS TÉRMINOS ESTABLECIDOS POR LA INSTITUCIÓN. LA DEMORA EN LA RETROALIMENTACIÓN AFECTA SU PROCESO FORMATIVO. EL APRENDIZ DEBE COMUNICAR LA SITUACIÓN A LA COORDINACIÓN ACADÉMICA, SOLICITANDO LA CELERIDAD EN LA ENTREGA DE RESULTADOS, CONFORME AL <strong>ARTÍCULO 5º, NUMERAL 16</strong>.",
+                "caso_ambiente_aprendizaje_inseguro": "<strong>CASO:</strong> UN APRENDIZ IDENTIFICA QUE LAS CONDICIONES DE SEGURIDAD EN UN TALLER (EJ. CABLEADO EXPUESTO, FALTA DE VENTILACIÓN) NO SON ADECUADAS Y REPRESENTAN UN RIESGO PARA SU INTEGRIDAD FÍSICA Y LA DE SUS COMPAÑEROS.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL APRENDIZ TIENE DERECHO A RECIBIR FORMACIÓN EN UN AMBIENTE SEGURO Y ADECUADO. DEBE REPORTAR INMEDIATAMENTE LA SITUACIÓN A SU INSTRUCTOR, AL COORDINADOR DEL PROGRAMA O AL ÁREA DE SALUD OCUPACIONAL DEL CENTRO DE FORMACIÓN. SI NO HAY RESPUESTA, PUEDE ELEVAR UNA QUEJA FORMAL, AMPARÁNDOSE EN EL <strong>ARTÍCULO 5º, NUMERAL 5</strong> Y LOS PRINCIPIOS DE DIGNIDAD Y SEGURIDAD.",
+                "caso_negacion_apoyo_emprendimiento": "<strong>CASO:</strong> UN APRENDIZ CON UNA IDEA DE NEGOCIO INNOVADORA SOLICITA ASESORÍA Y APOYO PARA SU PROYECTO A LA UNIDAD DE EMPRENDIMIENTO DEL SENA, PERO LE NIEGAN LA ATENCIÓN POR NO HABER CULMINADO AÚN SU ETAPA LECTIVA.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL SENA PROMUEVE EL EMPRENDIMIENTO Y EL DESARROLLO DE PROYECTOS PRODUCTIVOS. EL APRENDIZ TIENE DERECHO A ACCEDER A LOS SERVICIOS DE BIENESTAR Y APOYO INSTITUCIONAL. DEBE REVISAR LOS REQUISITOS ESPECÍFICOS PARA EL ACCESO A ESTOS PROGRAMAS Y, SI CUMPLE, SOLICITAR LA REVISIÓN DE SU CASO ANTE LA COORDINACIÓN DE EMPRENDIMIENTO O LA SUBDIRECCIÓN DEL CENTRO, CITANDO LOS PRINCIPIOS DE FORMACIÓN INTEGRAL.",
+                "caso_restriccion_actividades_culturales": "<strong>CASO:</strong> UN GRUPO DE APRENDICES DESEA ORGANIZAR UNA ACTIVIDAD CULTURAL EN EL CENTRO DE FORMACIÓN, PERO LAS DIRECTIVAS LES IMPONEN RESTRICCIONES EXCESIVAS QUE IMPIDEN LA REALIZACIÓN DEL EVENTO.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> LOS APRENDICES TIENEN DERECHO A PARTICIPAR EN ACTIVIDADES QUE COMPLEMENTEN SU FORMACIÓN Y PROMUEVAN LA CONVIVENCIA. SI LAS RESTRICCIONES SON DESPROPORCIONADAS, EL GRUPO DEBE SOLICITAR UNA REUNIÓN CON LAS DIRECTIVAS PARA NEGOCIAR LAS CONDICIONES, CITANDO EL DERECHO A LA PARTICIPACIÓN Y EL DESARROLLO INTEGRAL DEL APRENDIZ (<strong>ARTÍCULO 5º, NUMERAL 20</strong>).",
+
+                // Casos Capítulo III: Deberes del Aprendiz SENA
+                "caso_uso_personal_equipo": "<strong>CASO:</strong> UN APRENDIZ ES SORPRENDIDO UTILIZANDO EL EQUIPO DE CÓMPUTO DEL SENA PARA ACTIVIDADES PERSONALES (JUEGOS EN LÍNEA) DE FORMA RECURRENTE DURANTE LAS HORAS DE CLASE, AFECTANDO SU DESEMPEÑO Y EL DE OTROS.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL APRENDIZ TIENE EL DEBER DE DEDICARSE DE FORMA EXCLUSIVA A LAS ACTIVIDADES DE FORMACIÓN Y HACER USO ADECUADO DE LOS BIENES DEL SENA. EL INSTRUCTOR DEBE LLAMARLE LA ATENCIÓN, RECORDARLE SUS DEBERES Y, SI LA CONDUCTA PERSISTE, APLICAR UNA MEDIDA FORMATIVA. SI LA SITUACIÓN ES GRAVE, SE PODRÍA ESCALAR A UNA FALTA DISCIPLINARIA (<strong>ARTÍCULO 9º, NUMERAL 2</strong>: USO INADECUADO DE BIENES).",
+                "caso_llegadas_tarde": "<strong>CASO:</strong> UN APRENDIZ LLEGA TARDE CONSTANTEMENTE A LAS CLASES, LO QUE INTERRUMPE EL DESARROLLO DE LAS SESIONES Y RETRASA EL INICIO DE LAS ACTIVIDADES.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL APRENDIZ TIENE EL DEBER DE ASISTIR PUNTUALMENTE Y CUMPLIR CON LA TOTALIDAD DE LA JORNADA DE FORMACIÓN. EL INSTRUCTOR DEBE REGISTRAR LAS LLEGADAS TARDE Y HABLAR CON EL APRENDIZ SOBRE EL IMPACTO DE SU IMPUNTUALIDAD. INICIALMENTE SE APLICARÍA UNA MEDIDA FORMATIVA (LLAMADO DE ATENCIÓN VERBAL O PLAN DE MEJORAMIENTO). SI EL COMPORTAMIENTO ES REITERATIVO, PODRÍA CONSTITUIR UNA FALTA DISCIPLINARIA.",
+                "caso_negativa_epp": "<strong>CASO:</strong> UN APRENDIZ SE NIEGA A USAR LOS ELEMENTOS DE PROTECCIÓN PERSONAL (EPP) SUMINISTRADOS POR EL SENA DURANTE LAS PRÁCTICAS DE TALLER, ARGUMENTANDO INCOMODIDAD, A PESAR DE LAS ADVERTENCIAS DEL INSTRUCTOR.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL APRENDIZ TIENE EL DEBER DE USAR Y MANTENER ADECUADAMENTE LOS EPP. LA NEGATIVA PONE EN RIESGO SU SEGURIDAD Y LA DE OTROS. EL INSTRUCTOR DEBE INSISTIR EN EL CUMPLIMIENTO DE LA NORMA Y, SI EL APRENDIZ PERSISTE EN SU ACTITUD, SE LE IMPEDIRÁ PARTICIPAR EN LA PRÁCTICA Y SE APLICARÁ UNA MEDIDA FORMATIVA O DISCIPLINARIA (POSIBLE FALTA GRAVE POR PONER EN RIESGO LA SEGURIDAD).",
+                "caso_plagio_evidencia": "<strong>CASO:</strong> UN APRENDIZ ES DESCUBIERTO PLAGIANDO INFORMACIÓN DE INTERNET PARA PRESENTAR UNA EVIDENCIA DE APRENDIZAJE CRUCIAL, SIN DAR EL CRÉDITO CORRESPONDIENTE.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL APRENDIZ TIENE EL DEBER DE ACTUAR CON HONESTIDAD EN TODAS LAS ACTIVIDADES. EL PLAGIO ES UNA CONDUCTA PROHIBIDA Y UNA FALTA GRAVE O MUY GRAVE. SE DEBE APLICAR EL DEBIDO PROCESO DISCIPLINARIO, INICIANDO CON UN LLAMADO DE ATENCIÓN, LUEGO UNA MEDIDA FORMATIVA Y, DEPENDIENDO DE LA GRAVEDAD Y RECURRENCIA, UNA SANCIÓN ACADÉMICA O DISCIPLINARIA.",
+                "caso_abandono_etapa_productiva": "<strong>CASO:</strong> UN APRENDIZ QUE ESTÁ REALIZANDO SU ETAPA PRODUCTIVA EN UNA EMPRESA, ABANDONA SUS FUNCIONES SIN PREVIO AVISO AL SENA NI A LA EMPRESA, DEJANDO EL PROCESO INCONCLUSO.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL APRENDIZ TIENE EL DEBER DE CUMPLIR CON LA ETAPA PRODUCTIVA. ESTE COMPORTAMIENTO ES UNA FALTA GRAVE QUE PUEDE SER CONSIDERADA DESERCIÓN. EL SENA DEBE INICIAR EL PROCEDIMIENTO DE DESERCIÓN (<strong>ARTÍCULO 31º</strong>), Y EL APRENDIZ PERDERÁ SU MATRÍCULA Y LA OPORTUNIDAD DE CERTIFICAR.",
+                "caso_ambiente_hostil_whatsapp": "<strong>CASO:</strong> UN APRENDIZ GENERA UN AMBIENTE HOSTIL EN EL GRUPO DE WHATSAPP DEL PROGRAMA, CON COMENTARIOS OFENSIVOS Y DESPECTIVOS HACIA SUS COMPAÑEROS Y EL INSTRUCTOR.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL APRENDIZ TIENE EL DEBER DE MANTENER UNA CONDUCTA RESPETUOSA Y ADECUADA EN TODOS LOS AMBIENTES DE FORMACIÓN, INCLUYENDO LOS VIRTUALES. ESTO ES UNA FALTA CONTRA EL RESPETO Y LA BUENA CONVIVENCIA. SE DEBE REALIZAR UN LLAMADO DE ATENCIÓN, UNA MEDIDA FORMATIVA Y, SI PERSISTE, UNA SANCIÓN DISCIPLINARIA.",
+                "caso_certificado_falso": "<strong>CASO:</strong> UN APRENDIZ, CON EL FIN DE EVADIR UNA EVALUACIÓN, PRESENTA UN CERTIFICADO MÉDICO FALSO PARA JUSTIFICAR SU INASISTENCIA.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL APRENDIZ TIENE EL DEBER DE SUMINISTRAR INFORMACIÓN VERAZ Y COMPLETA. PRESENTAR DOCUMENTOS FALSOS ES UNA FALTA MUY GRAVE. SE DEBE INICIAR UN PROCESO DISCIPLINARIO CON LAS SANCIONES CORRESPONDIENTES, QUE PUEDEN INCLUIR LA CANCELACIÓN DE LA MATRÍCULA.",
+                "caso_niega_actividad_obligatoria": "<strong>CASO:</strong> UN APRENDIZ SE NIEGA A PARTICIPAR EN UNA ACTIVIDAD EXTRACURRICULAR DE TIPO CULTURAL ORGANIZADA POR EL SENA, A PESAR DE QUE LA ASISTENCIA ERA OBLIGATORIA PARA EL DESARROLLO DE UN RESULTADO DE APRENDIZAJE INTEGRAL.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL APRENDIZ TIENE EL DEBER DE PARTICIPAR ACTIVAMENTE EN LAS ACTIVIDADES FORMATIVAS Y COMPLEMENTARIAS. SI LA ACTIVIDAD ES OBLIGATORIA Y VINCULADA A UN RESULTADO DE APRENDIZAJE, LA INASISTENCIA INJUSTIFICADA ES UN INCUMPLIMIENTO. SE DEBE APLICAR UN LLAMADO DE ATENCIÓN Y, SI NO HAY JUSTIFICACIÓN VÁLIDA, SE CALIFICARÁ COMO INCUMPLIMIENTO INJUSTIFICADO.",
+                "caso_dano_herramienta_deliberado": "<strong>CASO:</strong> UN APRENDIZ DAÑA DELIBERADAMENTE UNA HERRAMIENTA ESPECIALIZADA DEL TALLER DURANTE UNA PRÁCTICA, Y LUEGO INTENTA OCULTAR LO SUCEDIDO.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL APRENDIZ TIENE EL DEBER DE CUIDAR Y HACER USO ADECUADO DE LOS BIENES DEL SENA. EL DAÑO DELIBERADO Y EL INTENTO DE OCULTACIÓN SON FALTAS GRAVES O MUY GRAVES. SE DEBE INICIAR UN PROCESO DISCIPLINARIO Y EXIGIR LA REPARACIÓN DEL DAÑO.",
+                "caso_incumplimiento_reiterado_evidencias": "<strong>CASO:</strong> UN APRENDIZ NO CUMPLE CON LA PRESENTACIÓN DE VARIAS EVIDENCIAS DE APRENDIZAJE EN LAS FECHAS ESTABLECIDAS, SIN DAR NINGUNA JUSTIFICACIÓN VÁLIDA AL INSTRUCTOR.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL APRENDIZ TIENE EL DEBER DE DESARROLLAR LAS EVIDENCIAS DE APRENDIZAJE EN LOS TIEMPOS ESTABLECIDOS. EL INCUMPLIMIENTO INJUSTIFICADO REITERADO DE EVIDENCIAS PUEDE LLEVAR A LA DESERCIÓN O A UN PLAN DE MEJORAMIENTO DISCIPLINARIO O ACADÉMICO, Y EVENTUALMENTE A LA CANCELACIÓN DE LA MATRÍCULA SI NO REMEDIA LA SITUACIÓN.",
+                // Nuevos casos Capítulo III: Deberes del Aprendiz SENA
+                "caso_colusion_academica": "<strong>CASO:</strong> DOS APRENDICES SON DESCUBIERTOS COLUDIÉNDOSE PARA PRESENTAR UN TRABAJO INDIVIDUAL COMO PROPIO, COMPARTIENDO RESPUESTAS Y CÓDIGO FUENTE EN UN PROYECTO.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL APRENDIZ TIENE EL DEBER DE ACTUAR CON HONESTIDAD Y ORIGINALIDAD EN TODAS SUS ACTIVIDADES. LA COLUSIÓN ACADÉMICA SE CONSIDERA UNA FORMA DE FRAUDE Y ES UNA FALTA GRAVE O GRAVÍSIMA. SE DEBE INICIAR UN PROCESO DISCIPLINARIO PARA AMBOS APRENDICES, CON LAS SANCIONES CORRESPONDIENTES QUE PODRÍAN INCLUIR LA ANULACIÓN DEL TRABAJO Y MEDIDAS DISCIPLINARIAS (<strong>ARTÍCULO 9º, NUMERAL 1</strong>: FRAUDE Y PLAGIO).",
+                "caso_uso_software_sin_licencia": "<strong>CASO:</strong> UN APRENDIZ INSTALA Y UTILIZA SOFTWARE SIN LICENCIA EN LOS EQUIPOS DEL SENA PARA REALIZAR SUS EVIDENCIAS DE APRENDIZAJE, A PESAR DE LAS ADVERTENCIAS SOBRE EL USO LEGAL DE PROGRAMAS.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL APRENDIZ TIENE EL DEBER DE HACER USO ADECUADO Y LEGAL DE LOS RECURSOS TECNOLÓGICOS DEL SENA. LA INSTALACIÓN Y USO DE SOFTWARE SIN LICENCIA ES UNA VIOLACIÓN DE LAS NORMAS Y PUEDE CONSTITUIR UNA FALTA DISCIPLINARIA. SE DEBE APLICAR UNA MEDIDA FORMATIVA Y EXIGIR LA DESINSTALACIÓN DEL SOFTWARE. SI PERSISTE, PODRÍA ESCALAR A UNA SANCIÓN (<strong>ARTÍCULO 9º, NUMERAL 2</strong>: USO INADECUADO DE BIENES Y RECURSOS).",
+                "caso_no_participacion_iniciativas_ambientales": "<strong>CASO:</strong> EL SENA ORGANIZA UNA JORNADA DE REFORESTACIÓN COMO PARTE DE SU COMPROMISO AMBIENTAL, Y UN APRENDIZ SE NIEGA A PARTICIPAR, AUNQUE LA ACTIVIDAD ES PARTE INTEGRAL DE SU FORMACIÓN Y CONVIVENCIA.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL APRENDIZ TIENE EL DEBER DE PARTICIPAR EN LAS ACTIVIDADES COMPLEMENTARIAS QUE PROMUEVAN EL DESARROLLO INTEGRAL Y LA POLÍTICA INSTITUCIONAL, COMO LAS INICIATIVAS AMBIENTALES. LA NEGATIVA INJUSTIFICADA PUEDE SER CONSIDERADA UN INCUMPLIMIENTO. SE DEBE REALIZAR UN LLAMADO DE ATENCIÓN Y, SI ES REITERATIVO, PODRÍA LLEVAR A UNA MEDIDA FORMATIVA (<strong>ARTÍCULO 8º, NUMERAL 1</strong>: CUMPLIR CON ACTIVIDADES).",
+                "caso_ocultacion_mala_conducta_compañero": "<strong>CASO:</strong> UN APRENDIZ ES TESTIGO DE UNA FALTA GRAVE COMETIDA POR UN COMPAÑERO (EJ. DAÑO INTENCIONAL A UN EQUIPO), PERO SE NIEGA A REPORTARLO A LAS AUTORIDADES DEL SENA.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL APRENDIZ TIENE EL DEBER DE COLABORAR CON LA INSTITUCIÓN PARA MANTENER LA CONVIVENCIA Y EL ORDEN. OCULTAR INFORMACIÓN SOBRE FALTAS GRAVES PUEDE SER CONSIDERADO UN INCUMPLIMIENTO DE SUS DEBERES Y AFECTAR EL AMBIENTE DE FORMACIÓN. SE DEBE HACER UN LLAMADO DE ATENCIÓN Y RECORDARLE SU RESPONSABILIDAD DE REPORTAR CONDUCTAS INAPROPIADAS (<strong>ARTÍCULO 8º, NUMERAL 2</strong>: RESPETAR DERECHOS AJENOS Y NO ABUSAR DE LOS PROPIOS).",
+                "caso_abuso_canales_comunicacion": "<strong>CASO:</strong> UN APRENDIZ UTILIZA LOS GRUPOS OFICIALES DE WHATSAPP O PLATAFORMAS DEL SENA PARA DIFUNDIR CADENAS DE MENSAJES NO RELACIONADOS CON LA FORMACIÓN, PUBLICIDAD NO AUTORIZADA O CONTENIDO OFENSIVO.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL APRENDIZ TIENE EL DEBER DE HACER USO ADECUADO DE LOS CANALES DE COMUNICACIÓN INSTITUCIONALES Y RESPETAR A LOS DEMÁS MIEMBROS DE LA COMUNIDAD EDUCATIVA. ESTA CONDUCTA PUEDE GENERAR UN AMBIENTE HOSTIL Y ES UNA FALTA DISCIPLINARIA. SE DEBE REALIZAR UN LLAMADO DE ATENCIÓN Y, SI PERSISTE, APLICAR UNA MEDIDA FORMATIVA O SANCIONATORIA (<strong>ARTÍCULO 9º, NUMERAL 2</strong>: USO INADECUADO DE RECURSOS; <strong>ARTÍCULO 9º, NUMERAL 10</strong>: GENERAR AMBIENTES HOSTILES).",
+
+                // Casos Capítulo IV: Ingreso, Permanencia y Certificación
+                "caso_restriccion_inscripcion_sancion": "<strong>CASO:</strong> UN ASPIRANTE INTENTA INSCRIBIRSE A UN PROGRAMA DE FORMACIÓN, PERO EL SISTEMA LE IMPIDE EL REGISTRO PORQUE FUE SANCIONADO CON UNA CANCELACIÓN DE MATRÍCULA DEFINITIVA EN UN PROGRAMA ANTERIOR.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL REGLAMENTO ESTABLECE RESTRICCIONES PARA LA INSCRIPCIÓN BASADAS EN SANCIONES PREVIAS. EN ESTE CASO, LA CANCELACIÓN DEFINITIVA IMPIDE EL REINGRESO. EL ASPIRANTE NO PODRÁ INSCRIBIRSE Y DEBERÁ ACOGERSE A LA DECISIÓN, A MENOS QUE PUEDA DEMOSTRAR UN ERROR EN EL REGISTRO DE LA SANCIÓN.",
+                "caso_aplazamiento_fuera_plazo": "<strong>CASO:</strong> UN APRENDIZ NECESITA APLAZAR SU FORMACIÓN DEBIDO A UNA EMERGENCIA MÉDICA FAMILIAR GRAVE, PERO LA FECHA LÍMITE PARA SOLICITAR EL APLAZAMIENTO YA PASÓ.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL REGLAMENTO CONTEMPLA EL APLAZAMIENTO COMO UNA NOVEDAD ACADÉMICA. AUNQUE LA FECHA LÍMITE HAYA PASADO, EL APRENDIZ DEBE PRESENTAR LA SOLICITUD CON LA JUSTIFICACIÓN Y PRUEBAS DE FUERZA MAYOR. EL COMITÉ DE EVALUACIÓN Y SEGUIMIENTO DE APRENDICES, O LA INSTANCIA CORRESPONDIENTE, EVALUARÁ EL CASO EXCEPCIONALMENTE, CONSIDERANDO LA GRAVEDAD DE LA SITUACIÓN Y LA DOCUMENTACIÓN DE SOPORTE.",
+                "caso_no_entrega_plan_mejora": "<strong>CASO:</strong> UN APRENDIZ NO CUMPLE CON UN RESULTADO DE APRENDIZAJE EN EL PRIMER INTENTO Y EL INSTRUCTOR LE DA LA OPORTUNIDAD DE PRESENTARLO NUEVAMENTE, PERO EL APRENDIZ NO LO ENTREGA EN LA FECHA ACORDADA.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> SI EL APRENDIZ NO CUMPLE CON LAS EVIDENCIAS DE APRENDIZAJE, EL INSTRUCTOR DEBE GENERAR UN PLAN DE MEJORA. SI NO CUMPLE EL PLAN, SE PUEDE CONSIDERAR UN INCUMPLIMIENTO INJUSTIFICADO. SE DEBE APLICAR EL PROCEDIMIENTO ESTABLECIDO PARA EL INCUMPLIMIENTO INJUSTIFICADO, LO QUE PODRÍA DERIVAR EN UN PROCESO DE DESERCIÓN O UN PLAN DE MEJORAMIENTO DISCIPLINARIO.",
+                "caso_desercion_desconocimiento": "<strong>CASO:</strong> UN APRENDIZ ES CONSTANTEMENTE INASISTENTE A LAS CLASES, Y DESPUÉS DE SUPERAR EL LÍMITE DE INASISTENCIAS INJUSTIFICADAS, EL SENA INICIA EL PROCESO DE DESERCIÓN. EL APRENDIZ ALEGA QUE NO SABÍA EL LÍMITE DE INASISTENCIAS.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL REGLAMENTO ESTABLECE EL PROCEDIMIENTO EN CASO DE DESERCIÓN POR INASISTENCIA INJUSTIFICADA. EL DESCONOCIMIENTO DEL REGLAMENTO NO ES UNA EXCUSA VÁLIDA, YA QUE AL INICIO DE LA FORMACIÓN SE DEBE REALIZAR UNA INDUCCIÓN SOBRE EL MISMO. EL SENA DEBE SEGUIR EL PROCEDIMIENTO DE DESERCIÓN, NOTIFICANDO AL APRENDIZ Y DÁNDOLE LA OPORTUNIDAD DE PRESENTAR SUS DESCARGOS, PERO SI LAS INASISTENCIAS SON INJUSTIFICADAS Y SUPERAN EL LÍMITE, LA CANCELACIÓN DE MATRÍCULA ES EL RESULTADO.",
+                "caso_reingreso_otro_centro": "<strong>CASO:</strong> UN APRENDIZ QUE HABÍA SOLICITADO RETIRO VOLUNTARIO DE SU PROGRAMA HACE UN AÑO DESEA RETOMAR SUS ESTUDIOS EN EL MISMO PROGRAMA, PERO EN OTRO CENTRO DE FORMACIÓN.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL REGLAMENTO CONTEMPLA EL TRÁMITE DE REINGRESO BAJO CIERTAS CONDICIONES. EL APRENDIZ DEBE CUMPLIR CON LOS REQUISITOS PARA EL REINGRESO Y SEGUIR EL PROCEDIMIENTO ESTABLECIDO, QUE INCLUYE PRESENTAR LA SOLICITUD, VERIFICAR LA DISPONIBILIDAD DE CUPO Y VALIDAR LOS RESULTADOS DE APRENDIZAJE APROBADOS PREVIAMENTE.",
+                "caso_no_busca_etapa_productiva": "<strong>CASO:</strong> UN APRENDIZ FINALIZA SU ETAPA LECTIVA, PERO NO ENCUENTRA OPCIONES DE ETAPA PRODUCTIVA EN SU REGIÓN Y DECIDE NO BUSCAR ACTIVAMENTE, ESPERANDO QUE EL SENA LE ASIGNE UNA.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL REGLAMENTO ESTABLECE QUE EL APRENDIZ DEBE RECIBIR ORIENTACIÓN SOBRE LAS OPCIONES PARA DESARROLLAR SU ETAPA PRODUCTIVA Y SUS OBLIGACIONES. ES DEBER DEL APRENDIZ GESTIONAR ACTIVAMENTE SU ETAPA PRODUCTIVA. SI NO DEMUESTRA INTERÉS O GESTIÓN, Y LOS PLAZOS SE VENCEN, PUEDE CAER EN INCUMPLIMIENTO O DESERCIÓN. EL SENA LE BRINDARÁ ACOMPAÑAMIENTO, PERO LA RESPONSABILIDAD PRINCIPAL RECAE EN EL APRENDIZ.",
+                "caso_no_requisito_documental": "<strong>CASO:</strong> UN APRENDIZ APRUEBA TODOS LOS RESULTADOS DE APRENDIZAJE, PERO NO PRESENTA UNO DE LOS REQUISITOS DOCUMENTALES (EJ. CERTIFICADO DE BACHILLER) PARA LA CERTIFICACIÓN, LO QUE RETRASA LA EXPEDICIÓN DE SU TÍTULO.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> LA CERTIFICACIÓN ESTÁ CONDICIONADA AL CUMPLIMIENTO DE TODOS LOS RESULTADOS DE APRENDIZAJE Y LOS REQUISITOS INSTITUCIONALES. EL APRENDIZ DEBE GESTIONAR Y ENTREGAR EL DOCUMENTO FALTANTE PARA PODER OBTENER SU CERTIFICACIÓN. EL SENA NO EXPEDIRÁ EL TÍTULO HASTA QUE TODOS LOS REQUISITOS ESTÉN COMPLETOS.",
+                "caso_traslado_sin_cupo": "<strong>CASO:</strong> UN APRENDIZ SOLICITA UN TRASLADO DE JORNADA DEBIDO A UN NUEVO EMPLEO, PERO LE INFORMAN QUE NO HAY CUPO EN LA JORNADA DESEADA.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL TRASLADO ES UNA NOVEDAD ADMINISTRATIVA QUE ESTÁ SUJETA A DISPONIBILIDAD DE CUPO. SI NO HAY CUPO, EL SENA NO ESTÁ OBLIGADO A REALIZAR EL TRASLADO. EL APRENDIZ PUEDE OPTAR POR ESPERAR UNA NUEVA OPORTUNIDAD, BUSCAR OTRAS ALTERNATIVAS O, SI EL EMPLEO ES INCOMPATIBLE CON SU JORNADA ACTUAL, SOLICITAR UN APLAZAMIENTO SI CUMPLE LOS REQUISITOS.",
+                "caso_evaluacion_animadversion": "<strong>CASO:</strong> UN APRENDIZ CONSIDERA QUE UNA EVALUACIÓN NO FUE OBJETIVA DEBIDO A QUE EL INSTRUCTOR LE TIENE UNA ANIMADVERSIÓN PERSONAL.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL APRENDIZ TIENE DERECHO A SOLICITAR LA REVISIÓN DE LA EVALUACIÓN SI CONSIDERA QUE EL RESULTADO NO ES OBJETIVO. DEBE PRESENTAR SU SOLICITUD FORMALMENTE, ARGUMENTANDO LA FALTA DE OBJETIVIDAD (SIN ACUSACIONES PERSONALES INICIALES). SI LA SITUACIÓN PERSISTE Y LA PERCEPCIÓN DE ANIMADVERSIÓN ES FUERTE, PUEDE ESCALAR LA QUEJA A LA COORDINACIÓN ACADÉMICA O AL CONDUCTO REGULAR, SOLICITANDO QUE SU EVALUACIÓN SEA REVISADA POR OTRO INSTRUCTOR O UN COMITÉ.",
+                "caso_rechazo_psicotecnica": "<strong>CASO:</strong> UN ASPIRANTE CUMPLE CON LOS REQUISITOS ACADÉMICOS PARA UN PROGRAMA, PERO ES RECHAZADO EN LA ETAPA DE SELECCIÓN POR NO APROBAR UNA PRUEBA PSICOTÉCNICA, Y CONSIDERA QUE FUE INJUSTO.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> LA ETAPA DE SELECCIÓN ES PARTE DEL PROCESO DE INGRESO Y PUEDE INCLUIR PRUEBAS PSICOTÉCNICAS. EL ASPIRANTE PUEDE SOLICITAR UNA REVISIÓN DE SU PROCESO DE SELECCIÓN SI CREE QUE HUBO UN ERROR O UNA INJUSTICIA, PRESENTANDO UNA PETICIÓN FORMAL A LA OFICINA DE ADMISIONES O LA INSTANCIA COMPETENTE EN EL SENA. SIN EMBARGO, LAS DECISIONES DE SELECCIÓN SUELEN SER FINALES A MENOS QUE SE DEMUESTRE UN ERROR PROCEDIMENTAL.",
+                // Nuevos casos Capítulo IV: Ingreso, Permanencia y Certificación
+                "caso_reingreso_resultados_antiguos": "<strong>CASO:</strong> UN APRENDIZ QUE SE RETIRÓ VOLUNTARIAMENTE HACE TRES AÑOS INTENTA REINGRESAR AL MISMO PROGRAMA, PERO LE INFORMAN QUE ALGUNOS RESULTADOS DE APRENDIZAJE APROBADOS ANTERIORMENTE YA NO SON VÁLIDOS DEBIDO A LA ACTUALIZACIÓN DEL DISEÑO CURRICULAR.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL REGLAMENTO CONTEMPLA EL REINGRESO, PERO LA VALIDACIÓN DE RESULTADOS DE APRENDIZAJE ANTIGUOS ESTÁ SUJETA A LA VIGENCIA DEL DISEÑO CURRICULAR. EL APRENDIZ DEBE SOLICITAR LA VALIDACIÓN FORMAL DE SUS RESULTADOS Y, SI ALGUNOS NO SON VÁLIDOS, DEBERÁ CURSAR Y APROBAR LAS COMPETENCIAS ACTUALIZADAS (<strong>ARTÍCULO 16º</strong>: REINGRESO Y TRASLADO).",
+                "caso_traslado_requisitos_no_cumplidos": "<strong>CASO:</strong> UN APRENDIZ SOLICITA TRASLADO A UN PROGRAMA DIFERENTE EN OTRO CENTRO DE FORMACIÓN, PERO ES RECHAZADO PORQUE NO CUMPLE CON TODOS LOS PRERREQUISITOS ACADÉMICOS DEL NUEVO PROGRAMA.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL TRASLADO ENTRE PROGRAMAS ESTÁ CONDICIONADO AL CUMPLIMIENTO DE LOS PRERREQUISITOS DEL PROGRAMA DE DESTINO. EL APRENDIZ DEBE REVISAR EL DISEÑO CURRICULAR DEL NUEVO PROGRAMA Y, SI NO CUMPLE, DEBERÁ CURSAR Y APROBAR LOS MÓDULOS O COMPETENCIAS FALTANTES ANTES DE PODER REALIZAR EL TRASLADO (<strong>ARTÍCULO 16º</strong>: REINGRESO Y TRASLADO).",
+                "caso_demora_certificacion_administrativa": "<strong>CASO:</strong> UN APRENDIZ HA CULMINADO SATISFACTORIAMENTE TODAS SUS ETAPAS (LECTIVA Y PRODUCTIVA) Y APROBADO TODOS LOS RESULTADOS, PERO LA EXPEDICIÓN DE SU CERTIFICADO SE DEMORA POR MÁS DE DOS MESES DEBIDO A TRÁMITES ADMINISTRATIVOS INTERNOS DEL SENA.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL APRENDIZ TIENE DERECHO A OBTENER SU CERTIFICACIÓN O TÍTULO UNA VEZ CULMINADO Y APROBADO SU PROCESO FORMATIVO. LAS DEMORAS INJUSTIFICADAS SON UNA VULNERACIÓN DE ESTE DERECHO. EL APRENDIZ DEBE ELEVAR UNA PETICIÓN FORMAL A LA COORDINACIÓN ACADÉMICA Y A LA SUBDIRECCIÓN DEL CENTRO, SOLICITANDO LA CELERIDAD EN EL TRÁMITE, CITANDO EL <strong>ARTÍCULO 5º, NUMERAL 22</strong>.",
+                "caso_ausencia_justificada_evaluacion": "<strong>CASO:</strong> UN APRENDIZ SE AUSENTA A UNA EVALUACIÓN FINAL CRÍTICA DEBIDO A UNA EMERGENCIA MÉDICA COMPROBADA CON INCAPACIDAD. AL REGRESAR, EL INSTRUCTOR LE DICE QUE YA PERDIÓ LA OPORTUNIDAD.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> LAS AUSENCIAS JUSTIFICADAS POR FUERZA MAYOR O CASO FORTUITO DEBEN SER CONSIDERADAS. EL APRENDIZ DEBE PRESENTAR LA JUSTIFICACIÓN FORMALMENTE Y SOLICITAR LA REPROGRAMACIÓN DE LA EVALUACIÓN. EL REGLAMENTO CONTEMPLA LA POSIBILIDAD DE CUMPLIR ACTIVIDADES EN UN CRONOGRAMA ADICIONAL CUANDO LA AUSENCIA ES JUSTIFICADA (<strong>ARTÍCULO 28º</strong>: INCUMPLIMIENTO JUSTIFICADO).",
+                "caso_dificultad_etapa_productiva_externa": "<strong>CASO:</strong> UN APRENDIZ EN ETAPA PRODUCTIVA ES AFECTADO POR EL CIERRE REPENTINO DE LA EMPRESA DONDE REALIZABA SU PRÁCTICA, QUEDANDO SIN OPCIÓN PARA CONTINUAR Y CULMINAR SU ETAPA.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL SENA DEBE BRINDAR ACOMPAÑAMIENTO Y ORIENTACIÓN EN LA GESTIÓN DE LA ETAPA PRODUCTIVA. ANTE UNA SITUACIÓN INESPERADA COMO EL CIERRE DE LA EMPRESA, EL APRENDIZ DEBE INFORMAR INMEDIATAMENTE AL COORDINADOR DE LA ETAPA PRODUCTIVA. EL SENA DEBE APOYARLO EN LA BÚSQUEDA DE UNA NUEVA ALTERNATIVA O LA REUBICACIÓN, CONSIDERANDO LAS CIRCUNSTANCIAS DE FUERZA MAYOR (<strong>ARTÍCULO 32º</strong>: ALTERNATIVAS ETAPA PRODUCTIVA).",
+
+                // Casos Capítulo V: Régimen de Faltas, Medidas Formativas, Disciplinarias y Sancionatorias
+                "caso_copia_evaluacion_primera": "<strong>CASO:</strong> UN APRENDIZ ES SORPRENDIDO COPIANDO EN UNA EVALUACIÓN. ES SU PRIMERA FALTA DISCIPLINARIA.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> COPIAR EN UNA EVALUACIÓN ES UNA FALTA (GENERALMENTE GRAVE POR FRAUDE ACADÉMICO). EL INSTRUCTOR DEBE DOCUMENTAR LA SITUACIÓN Y NOTIFICAR AL APRENDIZ. AL SER LA PRIMERA VEZ, SE PODRÍA APLICAR UNA MEDIDA FORMATIVA COMO UN LLAMADO DE ATENCIÓN POR ESCRITO Y LA REPETICIÓN DE LA EVALUACIÓN (SI EL REGLAMENTO LO PERMITE), JUNTO CON LA PARTICIPACIÓN EN UNA ACTIVIDAD DE REFUERZO SOBRE HONESTIDAD ACADÉMICA. SI ES UNA FALTA MÁS GRAVE, PODRÍA IR A UN COMITÉ.",
+                "caso_agresion_verbal_instructor": "<strong>CASO:</strong> UN APRENDIZ AGREDE VERBALMENTE A UN INSTRUCTOR FRENTE A OTROS COMPAÑEROS, UTILIZANDO LENGUAJE SOEZ.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> LA AGRESIÓN VERBAL ES UNA FALTA GRAVE O MUY GRAVE POR IRRESPETO A UN MIEMBRO DE LA COMUNIDAD EDUCATIVA. EL INSTRUCTOR DEBE REPORTAR LA FALTA INMEDIATAMENTE. SE DEBE INICIAR EL PROCEDIMIENTO SANCIONATORIO, GARANTIZANDO EL DEBIDO PROCESO AL APRENDIZ (ESCUCHARLO EN DESCARGOS). DADA LA GRAVEDAD, ES PROBABLE QUE LA MEDIDA SANCIONATORIA SEA UNA CONDICIONALIDAD DE MATRÍCULA O INCLUSO UNA CANCELACIÓN, DEPENDIENDO DE LA CALIFICACIÓN DE LA FALTA Y EL CRITERIO DE LOS EQUIPOS ENCARGADOS.",
+                "caso_reincidencia_faltas_incompletas": "<strong>CASO:</strong> UN APRENDIZ REINCIDE EN LA FALTA DE PRESENTAR EVIDENCIAS DE APRENDIZAJE INCOMPLETAS, A PESAR DE HABER RECIBIDO LLAMADOS DE ATENCIÓN VERBALES Y UN PLAN DE MEJORAMIENTO ACADÉMICO PREVIO.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> LA REINCIDENCIA EN FALTAS (EN ESTE CASO, INCUMPLIMIENTO ACADÉMICO) AGRAVA LA SITUACIÓN. LAS MEDIDAS FORMATIVAS YA SE APLICARON. SE DEBE ESCALAR A UNA MEDIDA SANCIONATORIA, COMO LA CONDICIONALIDAD DE MATRÍCULA. SI PERSISTE, LA CANCELACIÓN DE MATRÍCULA PODRÍA SER LA CONSECUENCIA FINAL.",
+                "caso_hurto_sin_pruebas": "<strong>CASO:</strong> UN APRENDIZ ES ACUSADO POR UN COMPAÑERO DE HURTO DE SUS PERTENENCIAS DENTRO DEL CENTRO DE FORMACIÓN, PERO NO HAY TESTIGOS NI PRUEBAS CONCLUYENTES.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL REGLAMENTO SE RIGE POR PRINCIPIOS COMO LA PRESUNCIÓN DE INOCENCIA Y EL DEBIDO PROCESO. EL SENA DEBE INVESTIGAR LA ACUSACIÓN, RECOPILAR PRUEBAS Y ESCUCHAR LAS VERSIONES DE AMBAS PARTES. SI NO HAY PRUEBAS SUFICIENTES PARA DETERMINAR LA RESPONSABILIDAD DEL APRENDIZ, NO SE LE PODRÁ APLICAR UNA SANCIÓN DISCIPLINARIA, PERO SÍ SE PUEDEN REFORZAR LAS MEDIDAS DE SEGURIDAD Y CONVIVENCIA EN EL CENTRO.",
+                "caso_desorden_alcohol_actividad": "<strong>CASO:</strong> UN APRENDIZ, BAJO LOS EFECTOS DEL ALCOHOL, CAUSA DESORDEN Y ALTERA LA CONVIVENCIA EN LAS INSTALACIONES DEL SENA DURANTE UNA ACTIVIDAD EXTRACURRICULAR NOCTURNA.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> CONSUMIR SUSTANCIAS PSICOACTIVAS O ALCOHOL DENTRO DE LAS INSTALACIONES, Y ALTERAR LA CONVIVENCIA, SON FALTAS MUY GRAVES. SE DEBE ACTIVAR EL PROTOCOLO DE SEGURIDAD Y CONVIVENCIA. SE INICIARÁ UN PROCESO DISCIPLINARIO CON LA APLICACIÓN DE UNA SANCIÓN QUE PUEDE SER LA CANCELACIÓN DE MATRÍCULA, DADA LA GRAVEDAD DE LA FALTA Y EL RIESGO QUE REPRESENTA.",
+                "caso_proceso_sin_defensa": "<strong>CASO:</strong> UN APRENDIZ ES NOTIFICADO DE UN PROCESO DISCIPLINARIO EN SU CONTRA, PERO NO SE LE ENTREGA COPIA DE LAS PRUEBAS NI SE LE INFORMA CLARAMENTE DE QUÉ SE LE ACUSA, AFECTANDO SU DERECHO A LA DEFENSA.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL APRENDIZ TIENE DERECHO AL DEBIDO PROCESO, INCLUYENDO EL DERECHO A LA DEFENSA Y CONTRADICCIÓN. ESTO IMPLICA CONOCER LOS CARGOS Y LAS PRUEBAS EN SU CONTRA. SI ESTO OCURRE, EL APRENDIZ DEBE SOLICITAR FORMALMENTE UNA COPIA DE TODO EL EXPEDIENTE Y LA CLARIDAD DE LOS CARGOS. SI NO SE LE OTORGA, EL PROCESO PODRÍA SER VICIADO Y EL APRENDIZ PODRÍA APELAR LA DECISIÓN POR VICIOS EN EL PROCEDIMIENTO.",
+                "caso_nueva_falta_condicionalidad": "<strong>CASO:</strong> UN APRENDIZ ES SANCIONADO CON CONDICIONALIDAD DE MATRÍCULA POR UNA FALTA GRAVE, PERO DURANTE EL PERIODO DE CONDICIONALIDAD, COMETE OTRA FALTA LEVE.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> ESTAR EN CONDICIONALIDAD DE MATRÍCULA SIGNIFICA QUE CUALQUIER NUEVA FALTA, INCLUSO LEVE, PUEDE RESULTAR EN UNA SANCIÓN MÁS SEVERA. EL COMITÉ DEBE EVALUAR LA NUEVA FALTA, LOS ANTECEDENTES DEL APRENDIZ (ESTAR EN CONDICIONALIDAD ES UN AGRAVANTE) Y LA SANCIÓN MÁS ADECUADA, QUE PODRÍA SER LA CANCELACIÓN DE LA MATRÍCULA.",
+                "caso_protesta_danos": "<strong>CASO:</strong> UN GRUPO DE APRENDICES ORGANIZA UNA PROTESTA NO AUTORIZADA DENTRO DEL CENTRO DE FORMACIÓN, CAUSANDO DAÑOS MENORES A LA INFRAESTRUCTURA.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> PARTICIPAR EN ACTIVIDADES NO AUTORIZADAS Y CAUSAR DAÑOS A LA INFRAESTRUCTURA SON FALTAS GRAVES O MUY GRAVES. SE DEBE IDENTIFICAR A LOS RESPONSABLES Y APLICAR EL DEBIDO PROCESO DISCIPLINARIO. LA SANCIÓN DEPENDERÁ DE LA CALIFICACIÓN DE LA FALTA, EL NIVEL DE PARTICIPACIÓN Y EL VALOR DE LOS DAÑOS CAUSADOS. ADEMÁS DE LA SANCIÓN, SE PODRÍA EXIGIR LA REPARACIÓN DE LOS DAÑOS.",
+                "caso_difamacion_redes": "<strong>CASO:</strong> UN APRENDIZ, MOLESTO CON UNA EVALUACIÓN, PUBLICA COMENTARIOS DIFAMATORIOS CONTRA SU INSTRUCTOR EN REDES SOCIALES.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> LAS FALTAS CONTRA EL BUEN NOMBRE Y LA CONVIVENCIA, INCLUIDAS EN ENTORNOS VIRTUALES, SON GRAVES. EL INSTRUCTOR DEBE DOCUMENTAR LA SITUACIÓN. SE INICIARÁ UN PROCESO DISCIPLINARIO Y LA SANCIÓN DEPENDERÁ DE LA GRAVEDAD DE LOS COMENTARIOS Y SU DIFUSIÓN, PUDIENDO SER UNA CONDICIONALIDAD O CANCELACIÓN DE MATRÍCULA. EL APRENDIZ TENDRÁ DERECHO A LA DEFENSA.",
+                "caso_soborno_instructor": "<strong>CASO:</strong> UN APRENDIZ INTENTA SOBORNAR A UN INSTRUCTOR PARA QUE LE APRUEBE UN RESULTADO DE APRENDIZAJE QUE NO HA CUMPLIDO.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL INTENTO DE SOBORNO ES UNA FALTA MUY GRAVE QUE ATENTA CONTRA LA INTEGRIDAD Y LA HONESTIDAD INSTITUCIONAL. EL INSTRUCTOR DEBE REPORTAR INMEDIATAMENTE LA SITUACIÓN. SE INICIARÁ UN PROCESO DISCIPLINARIO CON LA MÁXIMA SEVERIDAD, PROBABLEMENTE RESULTANDO EN LA CANCELACIÓN DEFINITIVA DE LA MATRÍCULA Y, SI APLICA, ACCIONES LEGALES.",
+                // Nuevos casos Capítulo V: Régimen de Faltas, Medidas Formativas, Disciplinarias y Sancionatorias
+                "caso_insubordinacion_par": "<strong>CASO:</strong> UN APRENDIZ SE NIEGA REITERADAMENTE A SEGUIR LAS INSTRUCCIONES DE UN COMPAÑERO QUE ACTÚA COMO MONITOR EN UNA PRÁCTICA, GENERANDO CONFLICTO EN EL GRUPO.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL REGLAMENTO PROMUEVE EL RESPETO Y LA CONVIVENCIA ARMÓNICA ENTRE TODOS LOS MIEMBROS DE LA COMUNIDAD EDUCATIVA. LA INSUBORDINACIÓN HACIA UN PAR EN UN ROL DE LIDERAZGO PUEDE SER CONSIDERADA UNA FALTA LEVE O GRAVE, DEPENDIENDO DE LA RECURRENCIA Y EL IMPACTO. SE DEBE HACER UN LLAMADO DE ATENCIÓN Y, SI PERSISTE, APLICAR UNA MEDIDA FORMATIVA O DISCIPLINARIA (<strong>ARTÍCULO 8º, NUMERAL 2</strong>: RESPETAR DERECHOS AJENOS; <strong>ARTÍCULO 9º, NUMERAL 10</strong>: ALTERAR CONVIVENCIA).",
+                "caso_uso_recursos_personales_ganancia": "<strong>CASO:</strong> UN APRENDIZ UTILIZA LOS EQUIPOS Y MATERIALES DEL SENA (EJ. IMPRESORA, PAPEL) PARA REALIZAR TRABAJOS PERSONALES CON FINES DE LUCRO EXTERNO, SIN AUTORIZACIÓN.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL USO DE RECURSOS INSTITUCIONALES PARA BENEFICIO PERSONAL O COMERCIAL SIN AUTORIZACIÓN ES UNA FALTA GRAVE. SE DEBE INICIAR UN PROCESO DISCIPLINARIO, EXIGIENDO LA REPARACIÓN DEL DAÑO O EL REEMBOLSO DE LOS GASTOS GENERADOS, Y APLICANDO UNA SANCIÓN QUE PUEDE SER UNA CONDICIONALIDAD DE MATRÍCULA (<strong>ARTÍCULO 9º, NUMERAL 2</strong>: USO INADECUADO DE BIENES Y RECURSOS).",
+                "caso_falsificacion_asistencia": "<strong>CASO:</strong> UN APRENDIZ ES DESCUBIERTO FIRMANDO LA ASISTENCIA POR UN COMPAÑERO AUSENTE PARA EVITAR QUE SE REGISTRE SU INASISTENCIA.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> LA FALSIFICACIÓN DE DOCUMENTOS O REGISTROS ES UNA FALTA GRAVÍSIMA QUE ATENTA CONTRA LA HONESTIDAD Y LA INTEGRIDAD ACADÉMICA Y ADMINISTRATIVA. SE DEBE INICIAR UN PROCESO DISCIPLINARIO CON LA MÁXIMA SEVERIDAD, PROBABLEMENTE RESULTANDO EN LA CANCELACIÓN DE LA MATRÍCULA PARA AMBOS APRENDICES INVOLUCRADOS (<strong>ARTÍCULO 9º, NUMERAL 1</strong>: FRAUDE Y PLAGIO; <strong>ARTÍCULO 9º, NUMERAL 11</strong>: SUPLANTACIÓN).",
+                "caso_acoso_cibernetico": "<strong>CASO:</strong> UN APRENDIZ CREA UN PERFIL FALSO EN REDES SOCIALES PARA DIFUNDIR RUMORES Y MENSAJES DE ACOSO CONTRA UN INSTRUCTOR Y OTROS APRENDICES DEL PROGRAMA.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> EL ACOSO Y LA DIFAMACIÓN, ESPECIALMENTE A TRAVÉS DE MEDIOS DIGITALES, SON FALTAS GRAVÍSIMAS QUE ATENTAN CONTRA LA DIGNIDAD Y LA CONVIVENCIA. SE DEBE INICIAR UN PROCESO DISCIPLINARIO INMEDIATO, Y LA SANCIÓN SERÁ SEVERA, PUDIENDO INCLUIR LA CANCELACIÓN DEFINITIVA DE LA MATRÍCULA Y, SI APLICA, ACCIONES LEGALES (<strong>ARTÍCULO 9º, NUMERAL 10</strong>: GENERAR AMBIENTES HOSTILES; <strong>ARTÍCULO 9º, NUMERAL 13</strong>: DIFAMACIÓN).",
+                "caso_reincidencia_faltas_leves_escalada": "<strong>CASO:</strong> UN APRENDIZ HA RECIBIDO TRES LLAMADOS DE ATENCIÓN VERBALES POR FALTAS LEVES (EJ. USO DE CELULAR EN CLASE, RETRASO EN ENTREGAS MENORES) EN EL ÚLTIMO MES, SIN MOSTRAR MEJORA EN SU CONDUCTA.<br><br><strong>ANÁLISIS Y SOLUCIÓN:</strong> LA REINCIDENCIA EN FALTAS LEVES, A PESAR DE LAS MEDIDAS FORMATIVAS PREVIAS, PUEDE LLEVAR A LA ESCALADA DEL PROCESO DISCIPLINARIO. SE DEBE APLICAR UNA MEDIDA FORMATIVA MÁS FORMAL, COMO UN LLAMADO DE ATENCIÓN ESCRITO CON UN PLAN DE MEJORAMIENTO DISCIPLINARIO. SI LA CONDUCTA PERSISTE, PODRÍA CONDUCIR A UNA CONDICIONALIDAD DE MATRÍCULA (<strong>ARTÍCULO 45º</strong>: MEDIDAS FORMATIVAS; <strong>ARTÍCULO 47º</strong>: MEDIDAS SANCIONATORIAS).",
+
+                // General cases already existing and reorganized
+                "inasistencia_consecutiva": "Si un aprendiz no asiste a formación durante <strong>TRES (3) DÍAS CONSECUTIVOS</strong> sin justificación, se considera una causal de <strong>DESERCIÓN</strong> del proceso de formación. Esto está establecido en el <strong>ARTÍCULO 30</strong> del Reglamento del Aprendiz SENA. La deserción conlleva un procedimiento específico que puede resultar en la cancelación de la matrícula. Es fundamental justificar cualquier ausencia para evitar estas consecuencias.",
+                "consumo_licor_formacion": "El <strong>ARTÍCULO 9</strong> del Reglamento del Aprendiz SENA, en sus prohibiciones, establece claramente que está prohibido <strong>INGRESAR O PERMANECER EN LOS AMBIENTES DE APRENDIZAJE, SEDES O EN CUALQUIER ESPACIO DONDE SE DESARROLLEN ACTIVIDADES DE FORMACIÓN, BAJO LOS EFECTOS DE BEBIDAS EMBRIAGANTES O SUSTANCIAS PSICOACTIVAS, O CONSUMIRLAS DURANTE EL HORARIO DE FORMACIÓN</strong>. Esta conducta se considera una <strong>FALTA GRAVÍSIMA</strong> y puede acarrear medidas disciplinarias y sancionatorias, de acuerdo con el <strong>CAPÍTULO V</strong> del reglamento. Las consecuencias pueden incluir la cancelación de matrícula, entre otras. Se recomienda revisar el Capítulo V para detalles sobre el procedimiento sancionatorio.",
+                "agresion_violencia": "Cualquier acto de <strong>AGRESIÓN, VIOLENCIA FÍSICA O VERBAL, ACOSO O MALTRATO</strong> entre miembros de la comunidad educativa está estrictamente prohibido y es considerado una <strong>FALTA GRAVÍSIMA</strong> según el <strong>ARTÍCULO 9</strong> y las disposiciones del <strong>CAPÍTULO V</strong> del Reglamento del Aprendiz SENA. Estas conductas conllevan a un proceso disciplinario que puede resultar en sanciones severas, incluyendo la cancelación de matrícula. Se insta a reportar estos incidentes a las autoridades competentes del SENA para activar los protocolos de atención y sanción.",
+                "incumplimiento_deber": "El <strong>INCUMPLIMIENTO DE LOS DEBERES</strong> establecidos en el <strong>ARTÍCULO 8</strong> del Reglamento del Aprendiz SENA puede dar lugar a medidas formativas o disciplinarias, dependiendo de la gravedad y recurrencia de la falta. Las faltas se clasifican en leves, graves y gravísimas, y <strong>CAPÍTULO V</strong> detalla el régimen sancionatorio y los procedimientos a seguir. Es importante que el aprendiz conozca y cumpla con sus deberes para asegurar una convivencia armónica y un proceso formativo exitoso.",
+                "dano_propiedad": "El <strong>DAÑO INTENCIONAL A LOS BIENES O RECURSOS</strong> del SENA, o de otros miembros de la comunidad educativa, es una conducta prohibida y puede ser considerada una <strong>FALTA GRAVE O GRAVÍSIMA</strong>, según el <strong>ARTÍCULO 9</strong> y el <strong>CAPÍTULO V</strong> del Reglamento del Aprendiz SENA. Esto puede acarrear medidas disciplinarias y la obligación de reparar el daño causado. Se recomienda siempre hacer uso adecuado de las instalaciones y equipos.",
+                "fraude_plagio": "Cometer <strong>FRAUDE ACADÉMICO, PLAGIO, COPIA EN EVALUACIONES, O ALTERAR DOCUMENTOS</strong> relacionados con el proceso formativo, son <strong>FALTAS GRAVÍSIMAS</strong> según el <strong>ARTÍCULO 9</strong> del Reglamento del Aprendiz SENA. Estas conductas conllevan a un proceso disciplinario que puede resultar en la cancelación de matrícula. La honestidad y la originalidad son principios fundamentales en el SENA.",
+                "porte_armas": "El <strong>PORTE DE ARMAS, ELEMENTOS CORTO-PUNZANTES O EXPLOSIVOS</strong> dentro de los ambientes de formación o en cualquier actividad relacionada con el SENA, está estrictamente prohibido y es una <strong>FALTA GRAVÍSIMA</strong>, según el <strong>ARTÍCULO 9</strong> del Reglamento del Aprendiz SENA. Esta conducta conlleva a un proceso disciplinario severo, incluyendo la cancelación de matrícula. La seguridad y la convivencia pacífica son prioritarias.",
+                "hurto_estafa_extorsion": "Cometer actos de <strong>HURTO, ESTAFA O EXTORSIÓN</strong> a cualquier miembro de la comunidad educativa o a la institución es una <strong>FALTA GRAVÍSIMA</strong>, según el <strong>ARTÍCULO 9</strong> del Reglamento del Aprendiz SENA. Estas acciones conllevan a un proceso disciplinario que puede resultar en la cancelación de matrícula y, en algunos casos, acciones legales. Respecto por la propiedad ajena y la integridad son fundamentales.",
+                "suplantacion": "La <strong>SUPLANTACIÓN DE IDENTIDAD</strong>, ya sea para beneficio propio o de terceros, en cualquier actividad académica o administrativa, es una <strong>FALTA GRAVÍSIMA</strong> según el <strong>ARTÍCULO 9</strong> del Reglamento del Aprendiz SENA. Esta conducta puede llevar a la cancelación de matrícula y otras sanciones disciplinarias. La transparencia y la veracidad son esenciales en el proceso formativo.",
+                "desorden_convivencia": "Promover o participar en <strong>ACTOS DE DESORDEN, INDISCIPLINA O ALTERACIÓN DE LA CONVIVENCIA</strong> en los ambientes de formación o en actividades del SENA, es una conducta que puede ser considerada una <strong>FALTA LEVE, GRAVE O GRAVÍSIMA</strong>, dependiendo de su impacto y recurrencia, según el <strong>ARTÍCULO 9</strong> y el <strong>CAPÍTULO V</strong> del Reglamento del Aprendiz SENA. Se espera que los aprendices contribuyan a un ambiente de respeto y armonía.",
+                "consumo_tabaco": "El <strong>CONSUMO DE TABACO O CIGARRILLOS ELECTRÓNICOS</strong> en lugares prohibidos dentro de las instalaciones del SENA o en ambientes de formación es una conducta que puede ser objeto de medidas formativas o disciplinarias, según el <strong>ARTÍCULO 9</strong> y el <strong>CAPÍTULO V</strong> del Reglamento del Aprendiz SENA. Se insta a respetar las normas de convivencia y salud pública establecidas por la institución.",
+                "actos_inmorales": "Realizar <strong>ACTOS QUE ATENTEN CONTRA LA MORAL, LAS BUENAS COSTUMBRES O LA INTEGRIDAD DE LAS PERSONAS</strong> en los ambientes de formación o en actividades del SENA, es una <strong>FALTA GRAVÍSIMA</strong> según el <strong>ARTÍCULO 9</strong> del Reglamento del Aprendiz SENA. Estas conductas conllevan a un proceso disciplinario severo, incluyendo la cancelación de matrícula. El respeto y la ética son pilares de la formación SENA."
+            },
+            "saludo": "¡Hola! Soy el Asistente Normativo SENA. Estoy aquí para ayudarte a comprender el Reglamento del Aprendiz SENA - Acuerdo 009 de 2024. Puedes preguntarme sobre <strong>DERECHOS</strong>, <strong>DEBERES</strong>, <strong>SANCIONES</strong>, <strong>PROCESOS DE INGRESO</strong>, los <strong>CAPÍTULOS DEL REGLAMENTO</strong>, o describir un <strong>CASO HIPOTÉTICO</strong> para analizarlo según la normativa. También puedes hacer clic en 'Generar Caso de Estudio ✨' para que la IA te cree uno.",
+            "despedida": "¡DE NADA! Si tienes más preguntas, no dudes en consultarme. ¡Que tengas un excelente día!",
+            "no_entendido": "Lo siento, no estoy seguro de cómo responder a eso. Por favor, intenta reformular tu pregunta o sé más específico. Puedes preguntarme sobre 'derechos', 'incumplimiento de actividades', 'sanciones', 'capítulos del reglamento', o describir un caso como 'qué pasa si un aprendiz consume licor en clase' o 'si alguien daña un equipo'."
+        };
+
+        // Function to add a message to the chat
+        function addMessage(text, sender) {
+            const messageContainer = document.createElement('div');
+            messageContainer.classList.add('message-container');
+
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+
+            if (sender === 'user') {
+                messageDiv.classList.add('user-message');
+                messageDiv.innerHTML = text;
+                messageContainer.appendChild(messageDiv);
+            } else {
+                const botAvatar = document.createElement('img');
+                botAvatar.src = botAvatarUrl;
+                botAvatar.alt = "Avatar del Chatbot";
+                botAvatar.classList.add('bot-avatar');
+                botAvatar.onerror = function() {
+                    this.onerror=null;
+                    this.src='https://placehold.co/60x60/796c86/ffffff?text=Bot'; // Updated fallback size
+                };
+                messageContainer.appendChild(botAvatar);
+
+                // Container for the message text and Lottie animation
+                const botContentWrapper = document.createElement('div');
+                botContentWrapper.classList.add('bot-content-wrapper');
+                
+                messageDiv.classList.add('bot-message');
+                messageDiv.innerHTML = text;
+                botContentWrapper.appendChild(messageDiv);
+
+                // Lottie player element for this specific bot message
+                const lottiePlayer = document.createElement('lottie-player');
+                lottiePlayer.src = botThinkingLottieUrl;
+                lottiePlayer.background = "transparent";
+                lottiePlayer.speed = "1";
+                lottiePlayer.style.width = "30px";
+                lottiePlayer.style.height = "30px";
+                lottiePlayer.loop = true;
+                lottiePlayer.autoplay = true;
+                lottiePlayer.classList.add('bot-thinking-lottie');
+                lottiePlayer.style.display = 'none'; // Hidden by default
+                botContentWrapper.appendChild(lottiePlayer);
+
+                messageContainer.appendChild(botContentWrapper);
+
+                // Update the global reference to the Lottie animation of the last bot message
+                currentBotLottieElement = lottiePlayer;
+
+                // Logic for speech synthesis and Lottie animation control
+                if (voiceEnabled && text !== "Pensando...") { // Avoid synthesizing "Pensando..."
+                    // Remove emojis from the text before speaking
+                    const textToSpeak = text.replace(/<[^>]*>/g, '').replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}]/gu, '');
+                    utterance.text = textToSpeak;
+                    synth.speak(utterance);
+                    // Show and play the Lottie animation when synthesis starts
+                    if (currentBotLottieElement) {
+                        currentBotLottieElement.style.display = 'block';
+                        currentBotLottieElement.play();
+                    }
+                } else if (text === "Pensando...") {
+                    // If it's the "Pensando..." message, show and play the Lottie animation immediately
+                    if (currentBotLottieElement) {
+                        currentBotLottieElement.style.display = 'block';
+                        currentBotLottieElement.play();
+                    }
+                } else {
+                    // If there's no voice and it's not "Pensando...", make sure the Lottie animation is hidden and stopped
+                    if (currentBotLottieElement) {
+                        currentBotLottieElement.style.display = 'none';
+                        currentBotLottieElement.stop();
+                    }
+                }
+            }
+            chatMessages.appendChild(messageContainer);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Function to toggle voice functionality (now only Text-to-Speech)
+        function toggleVoice() {
+            voiceEnabled = !voiceEnabled;
+            if (voiceEnabled) {
+                voiceBtn.textContent = 'Desactivar Voz';
+                addMessage("Voz de chatbot habilitada.", 'bot');
+            } else {
+                voiceBtn.textContent = 'Habilitar Voz';
+                synth.cancel(); // Stop any ongoing speech synthesis
+                addMessage("Voz de chatbot deshabilitada.", 'bot');
+                if (currentBotLottieElement) {
+                    currentBotLottieElement.style.display = 'none';
+                    currentBotLottieElement.stop();
+                }
+            }
+        }
+
+        // Function to generate a case study using Gemini
+        async function generateCaseStudy(topic) {
+            const selectedProfile = profileSelector.value;
+            addMessage("Pensando...", 'bot'); // Show Lottie animation
+            try {
+                const apiKey = ""; // The API key is provided at runtime by Canvas/Immersive
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                const llmPrompt = `Genera un caso de estudio hipotético basado en el Reglamento del Aprendiz SENA - Acuerdo 009 de 2024, específicamente sobre el tema o artículo: "${topic}". Incluye un "CASO:" that describes the situation, and an "ANÁLISIS Y SOLUCIÓN:" that explains how the regulation would apply to resolve it from the perspective of a ${selectedProfile}. Cite the relevant articles or chapters of the regulation in the analysis.`;
+
+                const payload = {
+                    contents: [{ role: "user", parts: [{ text: llmPrompt }] }],
+                    generationConfig: {
+                        temperature: 0.7,
+                        topP: 0.95,
+                        topK: 40,
+                    }
+                };
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                let generatedText = "Lo siento, no pude generar un caso de estudio en este momento.";
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    generatedText = result.candidates[0].content.parts[0].text;
+                    // Replace asterisks with <strong> tags
+                    generatedText = generatedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                    generatedText = generatedText.replace(/<strong>(.*?)<\/strong>/g, (match, p1) => `<strong>${p1.toUpperCase()}</strong>`);
+                }
+                
+                // Remove the "Pensando..." message before adding the final response
+                const thinkingMessageContainer = chatMessages.lastChild;
+                if (thinkingMessageContainer && thinkingMessageContainer.querySelector('.bot-message').textContent === 'Pensando...') {
+                    chatMessages.removeChild(thinkingMessageContainer);
+                }
+                addMessage(generatedText, 'bot');
+
+            } catch (error) {
+                console.error("Error calling LLM to generate case study:", error);
+                // Remove the "Pensando..." message before adding the error response
+                const thinkingMessageContainer = chatMessages.lastChild;
+                if (thinkingMessageContainer && thinkingMessageContainer.querySelector('.bot-message').textContent === 'Pensando...') {
+                    chatMessages.removeChild(thinkingMessageContainer);
+                }
+                addMessage("Hubo un problema al generar el caso de estudio. Por favor, inténtalo de nuevo.", 'bot');
+            } finally {
+                awaitingCaseTopic = false; // Reset state
+            }
+        }
+
+
+        // Function to process user input
+        async function processUserInput(input) {
+            const lowerInput = input.toLowerCase();
+            let botResponse = '';
+            const selectedProfile = profileSelector.value;
+
+            if (awaitingCaseTopic) {
+                // If we are waiting for the case topic, we call the generation function
+                awaitingCaseTopic = false; // Deactivate the state immediately to avoid loops
+                await generateCaseStudy(input);
+                return; // Exit the function after processing the case topic
+            }
+
+            // Logic for detecting specific cases (high priority)
+            if (lowerInput.includes("discapacidad auditiva") || (lowerInput.includes("ajustes") && lowerInput.includes("comunicación")) || lowerInput.includes("apoyo necesario discapacidad")) {
+                botResponse = knowledgeBase.casos.caso_discapacidad_auditiva;
+            } else if ((lowerInput.includes("evaluado") && lowerInput.includes("sin formación")) || (lowerInput.includes("evaluades") && lowerInput.includes("sin recursos")) || lowerInput.includes("evaluación injusta sin recursos")) {
+                botResponse = knowledgeBase.casos.caso_evaluacion_sin_recursos;
+            } else if ((lowerInput.includes("revision") || lowerInput.includes("revisión")) && lowerInput.includes("calificación") && (lowerInput.includes("niega") || lowerInput.includes("no atiende"))) {
+                botResponse = knowledgeBase.casos.caso_revision_calificacion_negada;
+            } else if (lowerInput.includes("embarazada") && (lowerInput.includes("etapa productiva") || lowerInput.includes("derechos") || lowerInput.includes("adaptaciones"))) {
+                botResponse = knowledgeBase.casos.caso_embarazada_etapa_productiva;
+            } else if (lowerInput.includes("falta") && (lowerInput.includes("epp") || lowerInput.includes("elementos de protección"))) {
+                botResponse = knowledgeBase.casos.caso_falta_epp;
+            } else if ((lowerInput.includes("discriminatorio") || lowerInput.includes("acoso") || lowerInput.includes("maltrato")) && (lowerInput.includes("orientacion sexual") || lowerInput.includes("instructor") || lowerInput.includes("compañero"))) {
+                botResponse = knowledgeBase.casos.caso_trato_discriminatorio;
+            } else if (lowerInput.includes("reconocimiento ignorado") || lowerInput.includes("no seleccionado") && lowerInput.includes("reconocimiento formativo")) {
+                botResponse = knowledgeBase.casos.caso_reconocimiento_ignorado;
+            } else if (lowerInput.includes("no puede postularse") || lowerInput.includes("restriccion") && lowerInput.includes("representante aprendices")) {
+                botResponse = knowledgeBase.casos.caso_restriccion_representante;
+            } else if (lowerInput.includes("no notificado") || lowerInput.includes("no avisaron") && (lowerInput.includes("novedad academica") || lowerInput.includes("cambio cronograma"))) {
+                botResponse = knowledgeBase.casos.caso_no_notificado_novedad;
+            } else if (lowerInput.includes("instructor") && (lowerInput.includes("niega asesoria") || lowerInput.includes("no da asesoria") || lowerInput.includes("pospone asesoria"))) {
+                botResponse = knowledgeBase.casos.caso_instructor_niega_asesoria;
+            }
+            // Nuevos casos Capítulo II: Derechos del Aprendiz SENA
+            else if (lowerInput.includes("participacion eventos") || (lowerInput.includes("participar") && lowerInput.includes("evento cultural"))) {
+                botResponse = knowledgeBase.casos.caso_participacion_eventos;
+            } else if (lowerInput.includes("retroalimentacion evaluacion tardia") || (lowerInput.includes("calificacion") && lowerInput.includes("demora"))) {
+                botResponse = knowledgeBase.casos.caso_retroalimentacion_evaluacion_tardia;
+            } else if (lowerInput.includes("ambiente aprendizaje inseguro") || (lowerInput.includes("condiciones") && lowerInput.includes("taller") && lowerInput.includes("riesgo"))) {
+                botResponse = knowledgeBase.casos.caso_ambiente_aprendizaje_inseguro;
+            } else if (lowerInput.includes("negacion apoyo emprendimiento") || (lowerInput.includes("asesoria") && lowerInput.includes("negada") && lowerInput.includes("emprendimiento"))) {
+                botResponse = knowledgeBase.casos.caso_negacion_apoyo_emprendimiento;
+            } else if (lowerInput.includes("restriccion actividades culturales") || (lowerInput.includes("organizar") && lowerInput.includes("actividad cultural") && lowerInput.includes("restricciones"))) {
+                botResponse = knowledgeBase.casos.caso_restriccion_actividades_culturales;
+            }
+            // Chapter III Cases: Duties
+            else if ((lowerInput.includes("equipo") || lowerInput.includes("computo")) && (lowerInput.includes("uso personal") || lowerInput.includes("juegos"))) {
+                botResponse = knowledgeBase.casos.caso_uso_personal_equipo;
+            } else if (lowerInput.includes("llega tarde") || lowerInput.includes("impuntualidad") || lowerInput.includes("retraso clases")) {
+                botResponse = knowledgeBase.casos.caso_llegadas_tarde;
+            } else if ((lowerInput.includes("niega") || lowerInput.includes("no usa")) && lowerInput.includes("epp") && lowerInput.includes("taller")) {
+                botResponse = knowledgeBase.casos.caso_negativa_epp;
+            } else if (lowerInput.includes("plagio") || lowerInput.includes("copiar evidencia") || lowerInput.includes("fraude academico")) {
+                botResponse = knowledgeBase.casos.caso_plagio_evidencia;
+            } else if ((lowerInput.includes("abandona") || lowerInput.includes("deja")) && lowerInput.includes("etapa productiva")) {
+                botResponse = knowledgeBase.casos.caso_abandono_etapa_productiva;
+            } else if (lowerInput.includes("ambiente hostil") || (lowerInput.includes("comentarios ofensivos") && lowerInput.includes("whatsapp"))) {
+                botResponse = knowledgeBase.casos.caso_ambiente_hostil_whatsapp;
+            } else if (lowerInput.includes("certificado medico falso") || lowerInput.includes("justificacion falsa")) {
+                botResponse = knowledgeBase.casos.caso_certificado_falso;
+            } else if ((lowerInput.includes("niega") || lowerInput.includes("no participa")) && lowerInput.includes("actividad obligatoria")) {
+                botResponse = knowledgeBase.casos.caso_niega_actividad_obligatoria;
+            } else if ((lowerInput.includes("daña") || lowerInput.includes("destruye")) && (lowerInput.includes("herramienta") || lowerInput.includes("taller")) && lowerInput.includes("deliberadamente")) {
+                botResponse = knowledgeBase.casos.caso_dano_herramienta_deliberado;
+            } else if ((lowerInput.includes("no cumple") || lowerInput.includes("incumplimiento")) && lowerInput.includes("evidencias") && lowerInput.includes("reiterado")) {
+                botResponse = knowledgeBase.casos.caso_incumplimiento_reiterado_evidencias;
+            }
+            // Nuevos casos Capítulo III: Deberes del Aprendiz SENA
+            else if (lowerInput.includes("colusion academica") || (lowerInput.includes("compartir") && lowerInput.includes("respuestas") && lowerInput.includes("trabajo individual"))) {
+                botResponse = knowledgeBase.casos.caso_colusion_academica;
+            } else if (lowerInput.includes("uso software sin licencia") || (lowerInput.includes("instala") && lowerInput.includes("software ilegal"))) {
+                botResponse = knowledgeBase.casos.caso_uso_software_sin_licencia;
+            } else if (lowerInput.includes("no participacion iniciativas ambientales") || (lowerInput.includes("niega") && lowerInput.includes("reforestacion"))) {
+                botResponse = knowledgeBase.casos.caso_no_participacion_iniciativas_ambientales;
+            } else if (lowerInput.includes("ocultacion mala conducta compañero") || (lowerInput.includes("testigo") && lowerInput.includes("no reporta") && lowerInput.includes("falta grave"))) {
+                botResponse = knowledgeBase.casos.caso_ocultacion_mala_conducta_compañero;
+            } else if (lowerInput.includes("abuso canales comunicacion") || (lowerInput.includes("difunde") && lowerInput.includes("cadenas") && lowerInput.includes("whatsapp oficial"))) {
+                botResponse = knowledgeBase.casos.caso_abuso_canales_comunicacion;
+            }
+
+            // Chapter IV Cases: Admission, Permanence and Certification
+            else if (lowerInput.includes("inscripcion rechazada") || (lowerInput.includes("no puede") && lowerInput.includes("inscribirse") && lowerInput.includes("sancion"))) {
+                botResponse = knowledgeBase.casos.caso_restriccion_inscripcion_sancion;
+            } else if (lowerInput.includes("aplazar") && lowerInput.includes("fuera de plazo")) {
+                botResponse = knowledgeBase.casos.caso_aplazamiento_fuera_plazo;
+            } else if ((lowerInput.includes("no entrega") || lowerInput.includes("no cumple")) && lowerInput.includes("plan de mejora")) {
+                botResponse = knowledgeBase.casos.caso_no_entrega_plan_mejora;
+            } else if (lowerInput.includes("desercion") && lowerInput.includes("no sabia limite")) {
+                botResponse = knowledgeBase.casos.caso_desercion_desconocimiento;
+            } else if (lowerInput.includes("reingreso") || lowerInput.includes("otro centro")) {
+                botResponse = knowledgeBase.casos.caso_reingreso_otro_centro;
+            } else if ((lowerInput.includes("no encuentra") || lowerInput.includes("no busca")) && lowerInput.includes("etapa productiva")) {
+                botResponse = knowledgeBase.casos.caso_no_busca_etapa_productiva;
+            } else if (lowerInput.includes("no presenta") && lowerInput.includes("requisito documental") && lowerInput.includes("certificacion")) {
+                botResponse = knowledgeBase.casos.caso_no_requisito_documental;
+            } else if (lowerInput.includes("traslado jornada") && lowerInput.includes("sin cupo")) {
+                botResponse = knowledgeBase.casos.caso_traslado_sin_cupo;
+            } else if (lowerInput.includes("evaluacion no objetiva") && lowerInput.includes("animadversion")) {
+                botResponse = knowledgeBase.casos.caso_evaluacion_animadversion;
+            } else if (lowerInput.includes("rechazado") && lowerInput.includes("prueba psicotecnica")) {
+                botResponse = knowledgeBase.casos.caso_rechazo_psicotecnica;
+            }
+            // Nuevos casos Capítulo IV: Ingreso, Permanencia y Certificación
+            else if (lowerInput.includes("reingreso resultados antiguos") || (lowerInput.includes("resultados") && lowerInput.includes("no validos") && lowerInput.includes("reingresar"))) {
+                botResponse = knowledgeBase.casos.caso_reingreso_resultados_antiguos;
+            } else if (lowerInput.includes("traslado requisitos no cumplidos") || (lowerInput.includes("traslado") && lowerInput.includes("rechazado") && lowerInput.includes("prerrequisitos"))) {
+                botResponse = knowledgeBase.casos.caso_traslado_requisitos_no_cumplidos;
+            } else if (lowerInput.includes("demora certificacion administrativa") || (lowerInput.includes("certificado") && lowerInput.includes("demora") && lowerInput.includes("tramites"))) {
+                botResponse = knowledgeBase.casos.caso_demora_certificacion_administrativa;
+            } else if (lowerInput.includes("ausencia justificada evaluacion") || (lowerInput.includes("ausente") && lowerInput.includes("evaluacion") && lowerInput.includes("incapacidad"))) {
+                botResponse = knowledgeBase.casos.caso_ausencia_justificada_evaluacion;
+            } else if (lowerInput.includes("dificultad etapa productiva externa") || (lowerInput.includes("cierre empresa") && lowerInput.includes("etapa productiva"))) {
+                botResponse = knowledgeBase.casos.caso_dificultad_etapa_productiva_externa;
+            }
+
+            // Chapter V Cases: Regime of Faults, Formative, Disciplinary and Sanctionary Measures
+            else if (lowerInput.includes("copia") && lowerInput.includes("evaluacion") && lowerInput.includes("primera falta")) {
+                botResponse = knowledgeBase.casos.caso_copia_evaluacion_primera;
+            } else if (lowerInput.includes("agrede verbalmente") && lowerInput.includes("instructor")) {
+                botResponse = knowledgeBase.casos.caso_agresion_verbal_instructor;
+            } else if (lowerInput.includes("reincide") && lowerInput.includes("faltas incompletas")) {
+                botResponse = knowledgeBase.casos.caso_reincidencia_faltas_incompletas;
+            } else if (lowerInput.includes("acusado hurto") && lowerInput.includes("sin pruebas")) {
+                botResponse = knowledgeBase.casos.caso_hurto_sin_pruebas;
+            } else if (lowerInput.includes("desorden") && lowerInput.includes("alcohol") && lowerInput.includes("actividad")) {
+                botResponse = knowledgeBase.casos.caso_desorden_alcohol_actividad;
+            } else if (lowerInput.includes("proceso disciplinario") && lowerInput.includes("sin defensa")) {
+                botResponse = knowledgeBase.casos.caso_proceso_sin_defensa;
+            } else if (lowerInput.includes("nueva falta") && lowerInput.includes("condicionalidad")) {
+                botResponse = knowledgeBase.casos.caso_nueva_falta_condicionalidad;
+            } else if (lowerInput.includes("protesta danos") || lowerInput.includes("protesta no autorizada") && lowerInput.includes("daños")) {
+                botResponse = knowledgeBase.casos.caso_protesta_danos;
+            } else if (lowerInput.includes("comentarios difamatorios") || lowerInput.includes("difama instructor redes sociales")) {
+                botResponse = knowledgeBase.casos.caso_difamacion_redes;
+            } else if (lowerInput.includes("soborno instructor") || lowerInput.includes("intenta sobornar")) {
+                botResponse = knowledgeBase.casos.caso_soborno_instructor;
+            }
+            // Nuevos casos Capítulo V: Régimen de Faltas, Medidas Formativas, Disciplinarias y Sancionatorias
+            else if (lowerInput.includes("insubordinacion par") || (lowerInput.includes("niega") && lowerInput.includes("instrucciones monitor"))) {
+                botResponse = knowledgeBase.casos.caso_insubordinacion_par;
+            } else if (lowerInput.includes("uso recursos personales ganancia") || (lowerInput.includes("utiliza") && lowerInput.includes("equipos sena") && lowerInput.includes("lucro"))) {
+                botResponse = knowledgeBase.casos.caso_uso_recursos_personales_ganancia;
+            } else if (lowerInput.includes("falsificacion asistencia") || (lowerInput.includes("firma") && lowerInput.includes("asistencia") && lowerInput.includes("compañero"))) {
+                botResponse = knowledgeBase.casos.caso_falsificacion_asistencia;
+            } else if (lowerInput.includes("acoso cibernetico") || (lowerInput.includes("perfil falso") && lowerInput.includes("acoso redes"))) {
+                botResponse = knowledgeBase.casos.caso_acoso_cibernetico;
+            } else if (lowerInput.includes("reincidencia faltas leves escalada") || (lowerInput.includes("tres") && lowerInput.includes("llamados atencion") && lowerInput.includes("faltas leves"))) {
+                botResponse = knowledgeBase.casos.caso_reincidencia_faltas_leves_escalada;
+            }
+
+            // Logic for detecting general cases (medium priority)
+            else if (
+                (lowerInput.includes("no asiste") || lowerInput.includes("inasistencia") || lowerInput.includes("ausencia")) &&
+                (lowerInput.includes("dias seguidos") || lowerInput.includes("días seguidos") || lowerInput.includes("consecutivos"))
+            ) {
+                const match = lowerInput.match(/(\d+)\s*(dias|días)/);
+                if (match && parseInt(match[1]) >= 3) {
+                    botResponse = knowledgeBase.casos.inasistencia_consecutiva;
+                } else if (match && parseInt(match[1]) < 3) {
+                    botResponse = "La inasistencia a formación debe ser justificada. Si la inasistencia injustificada es de <strong>TRES (3) DÍAS CONSECUTIVOS</strong> o <strong>CINCO (5) DÍAS NO CONSECUTIVOS</strong>, se considera deserción. Para menos días, se debe buscar la justificación con el instructor. (Basado en los <strong>ARTÍCULOS 28, 29 Y 30</strong> del Reglamento del Aprendiz SENA - Acuerdo 009 de 2024).";
+                } else {
+                    botResponse = knowledgeBase.casos.inasistencia_consecutiva; // Default for general inasistencia query
+                }
+            } else if (
+                (lowerInput.includes("licor") || lowerInput.includes("alcohol") || lowerInput.includes("beber") || lowerInput.includes("consumir")) &&
+                (lowerInput.includes("formacion") || lowerInput.includes("formación") || lowerInput.includes("clase") || lowerInput.includes("ambiente"))
+            ) {
+                botResponse = knowledgeBase.casos.consumo_licor_formacion;
+            } else if (
+                (lowerInput.includes("agresion") || lowerInput.includes("violencia") || lowerInput.includes("acoso") || lowerInput.includes("maltrato")) &&
+                (lowerInput.includes("aprendiz") || lowerInput.includes("instructor") || lowerInput.includes("formacion") || lowerInput.includes("compañero") || lowerInput.includes("comunidad"))
+            ) {
+                botResponse = knowledgeBase.casos.agresion_violencia;
+            } else if (
+                (lowerInput.includes("no cumple") || lowerInput.includes("incumplimiento")) &&
+                (lowerInput.includes("deber") || lowerInput.includes("deberes"))
+            ) {
+                botResponse = knowledgeBase.casos.incumplimiento_deber;
+            } else if (
+                (lowerInput.includes("dano") || lowerInput.includes("daño") || lowerInput.includes("destruye")) &&
+                (lowerInput.includes("propiedad") || lowerInput.includes("equipo") || lowerInput.includes("bienes") || lowerInput.includes("instalaciones") || lowerInput.includes("sena"))
+            ) {
+                botResponse = knowledgeBase.casos.dano_propiedad;
+            } else if (
+                (lowerInput.includes("fraude") || lowerInput.includes("plagio") || lowerInput.includes("copia") || lowerInput.includes("altera documentos"))
+            ) {
+                botResponse = knowledgeBase.casos.fraude_plagio;
+            } else if (
+                (lowerInput.includes("arma") || lowerInput.includes("armas") || lowerInput.includes("cuchillo") || lowerInput.includes("explosivo") || lowerInput.includes("porte"))
+            ) {
+                botResponse = knowledgeBase.casos.porte_armas;
+            } else if (
+                (lowerInput.includes("hurto") || lowerInput.includes("roba") || lowerInput.includes("estafa") || lowerInput.includes("extorsion") || lowerInput.includes("extorsión"))
+            ) {
+                botResponse = knowledgeBase.casos.hurto_estafa_extorsion;
+            } else if (
+                (lowerInput.includes("suplantar") || lowerInput.includes("suplantacion") || lowerInput.includes("suplantación"))
+            ) {
+                botResponse = knowledgeBase.casos.suplantacion;
+            } else if (
+                (lowerInput.includes("desorden") || lowerInput.includes("indisciplina") || lowerInput.includes("altera convivencia"))
+            ) {
+                botResponse = knowledgeBase.casos.desorden_convivencia;
+            } else if (
+                (lowerInput.includes("tabaco") || lowerInput.includes("cigarrillo electronico") || lowerInput.includes("fumar"))
+            ) {
+                botResponse = knowledgeBase.casos.consumo_tabaco;
+            } else if (
+                (lowerInput.includes("actos inmorales") || lowerInput.includes("malas costumbres") || lowerInput.includes("atenta moral"))
+            ) {
+                botResponse = knowledgeBase.casos.actos_inmorales;
+            }
+
+            // Logic for detecting general categories (low priority)
+            else if (lowerInput.includes("hola") || lowerInput.includes("saludo")) {
+                botResponse = knowledgeBase.saludo;
+            } else if (lowerInput.includes("derechos")) {
+                if (lowerInput.includes("articulo 5") || lowerInput.includes("artículo 5")) {
+                    botResponse = knowledgeBase.derechos.articulo_5;
+                } else {
+                    botResponse = knowledgeBase.derechos.general;
+                }
+            } else if (lowerInput.includes("incumplimiento") || lowerInput.includes("actividad formativa")) {
+                if (lowerInput.includes("justificado")) {
+                    botResponse = knowledgeBase.incumplimiento.justificado;
+                } else if (lowerInput.includes("injustificado")) {
+                    botResponse = knowledgeBase.incumplimiento.injustificado;
+                } else {
+                    botResponse = knowledgeBase.incumplimiento.general;
+                }
+            } else if (lowerInput.includes("sanciones") || lowerInput.includes("faltas")) {
+                botResponse = knowledgeBase.sanciones.general;
+            } else if (lowerInput.includes("capitulos") || lowerInput.includes("capítulos") || lowerInput.includes("capitulo")) {
+                botResponse = knowledgeBase.capitulos.general;
+            }
+            else if (lowerInput.includes("gracias") || lowerInput.includes("adios") || lowerInput.includes("adiós")) {
+                botResponse = knowledgeBase.despedida;
+            }
+
+            // Logic for the hybrid model: If no rule matches, consult the LLM
+            if (!botResponse) {
+                // Show Lottie animation while the LLM is thinking
+                addMessage("Pensando...", 'bot'); // This will now show the Lottie animation
+                try {
+                    const apiKey = ""; // The API key is provided at runtime by Canvas/Immersive
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                    const llmPrompt = `Actúa como un experto en el Reglamento del Aprendiz SENA - Acuerdo 009 de 2024. Responde a la siguiente pregunta desde la perspectiva de un ${selectedProfile}. Si la pregunta es sobre un caso hipotético, analiza la situación y proporciona una solución basada en el reglamento, citando los artículos o capítulos relevantes. Si la pregunta no está relacionada con el reglamento, indícale que no puedes responder. Pregunta: "${input}"`;
+
+                    const payload = {
+                        contents: [{ role: "user", parts: [{ text: llmPrompt }] }],
+                        generationConfig: {
+                            temperature: 0.7,
+                            topP: 0.95,
+                            topK: 40,
+                        }
+                    };
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const result = await response.json();
+
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        let llmText = result.candidates[0].content.parts[0].text;
+                        // Replace asterisks with <strong> tags
+                        llmText = llmText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                        llmText = llmText.replace(/<strong>(.*?)<\/strong>/g, (match, p1) => `<strong>${p1.toUpperCase()}</strong>`);
+                        botResponse = llmText;
+                    } else {
+                        botResponse = "Lo siento, no pude obtener una respuesta detallada en este momento. Por favor, intenta de nuevo más tarde o reformula tu pregunta.";
+                    }
+                } catch (error) {
+                    console.error("Error calling LLM:", error);
+                    botResponse = "Hubo un problema al procesar tu solicitud con el modelo avanzado. Por favor, inténtalo de nuevo.";
+                } finally {
+                    // Remove the "Pensando..." message before adding the final response
+                    const thinkingMessageContainer = chatMessages.lastChild;
+                    if (thinkingMessageContainer && thinkingMessageContainer.querySelector('.bot-message').textContent === 'Pensando...') {
+                        chatMessages.removeChild(thinkingMessageContainer);
+                    }
+                }
+            }
+            addMessage(botResponse, 'bot');
+        }
+
+        // Event for the send button
+        sendBtn.addEventListener('click', () => {
+            const input = userInput.value.trim();
+            if (input) {
+                addMessage(input, 'user');
+                userInput.value = '';
+                processUserInput(input);
+            }
+        });
+
+        // Event for the Enter key in the text field
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendBtn.click();
+            }
+        });
+
+        // Event for the voice button
+        voiceBtn.addEventListener('click', toggleVoice);
+
+        // Event for the new generate case study button
+        generateCaseBtn.addEventListener('click', () => {
+            awaitingCaseTopic = true; // Activate waiting state
+            addMessage("¿Sobre qué tema o artículo del reglamento te gustaría un caso de estudio? Por ejemplo: 'plagio' o 'derechos del aprendiz'.", 'bot');
+        });
+
+        // Initial welcome message from the bot
+        window.onload = () => {
+            addMessage(knowledgeBase.saludo, 'bot');
+        };
+    </script>
+</body>
+</html>
